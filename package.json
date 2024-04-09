@@ -1,0 +1,19 @@
+{
+  "name": "a_nestjs",
+  "version": "1.0.0",
+  "description": "```ts   import { ValidationPipe } from '@nestjs/common';   import { NestFactory } from '@nestjs/core';   import { AppModule } from './app.module';",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HyeongJinK/A_NestJS.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/HyeongJinK/A_NestJS/issues"
+  },
+  "homepage": "https://github.com/HyeongJinK/A_NestJS#readme"
+}
