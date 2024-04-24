@@ -18,10 +18,11 @@
   },
   "homepage": "https://github.com/HyeongJinK/A_NestJS#readme",
   "dependencies": {
-    "reflect-metadata": "^0.2.2",
-    "typescript": "^5.4.4"
+    "reflect-metadata": "^0.2.2"
   },
   "devDependencies": {
-    "ts-node": "^10.9.2"
+    "ts-node": "^10.9.2",
+    "tsc-watch": "^6.2.0",
+    "typescript": "^5.4.4"
   }
 }

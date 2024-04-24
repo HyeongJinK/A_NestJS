@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 
 export function Module(metadata: any): ClassDecorator {
-    const propsKeys = Object.keys(metadata);
+    const propsKeys = Object.keys(metadata);    // 데코레이션을 선언할 때 전달된 메타데이터 키값
 
     for(const key of propsKeys) {
         console.log("Key = " +key);
