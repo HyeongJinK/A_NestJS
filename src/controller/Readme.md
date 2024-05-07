@@ -62,5 +62,5 @@ export const GLOBAL_MODULE_METADATA = '__module:global__';
 export const HOST_METADATA = 'host';
 export const PATH_METADATA = 'path';
 export const SCOPE_OPTIONS_METADATA = 'scope:options';
-export const VERSION_METADATA = '__version__';
+export const VERSION_METADATA = '__version__'
 ```
