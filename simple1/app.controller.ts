@@ -6,4 +6,9 @@ export class AppController {
     getHello(): string {
       return 'Hello World!';
     }
+
+    @Get('/test')
+    getTest(): string {
+        return 'Test';
+    }
 }

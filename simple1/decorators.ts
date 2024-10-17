@@ -3,6 +3,7 @@ const routes = new Map();
 // @Controller 데코레이터
 export function Controller(prefix: string) {
   return function (target: any) {
+    console.log('Controller prefix:', prefix);
     target.prototype.prefix = prefix;
   };
 }
@@ -11,6 +12,7 @@ export function Controller(prefix: string) {
 export function Get(path: string) {
   return function (target: any, key: string) {
     const prefix = target.constructor.prototype.prefix || '';
+    console.log('prefix:', prefix);
     routes.set(`${prefix}${path}`, target[key]);
   };
 }
