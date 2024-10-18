@@ -6,7 +6,7 @@ npm install reflect-metadata
 npx tsc --init
 
 npx tsc
-node index.js
+node index.ts
 ```
 
 ## 데코레이터를 사용하기 위해서
