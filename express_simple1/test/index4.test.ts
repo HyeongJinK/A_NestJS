@@ -3,7 +3,7 @@
 // __tests__/app.test.ts
 // npm i jest supertest
 import request from 'supertest';
-import app from './index4';
+import app from '../src/index4';
 
 describe('AppController (e2e)', () => {
   it('GET / should return Hello, World!', async () => {

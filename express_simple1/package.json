@@ -9,6 +9,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@types/inversify": "^2.0.32",
     "@types/jest": "^29.5.13",
     "@types/supertest": "^6.0.2",
     "express": "^4.21.1",
