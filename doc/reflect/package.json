@@ -1,0 +1,15 @@
+{
+  "name": "reflect",
+  "version": "1.0.0",
+  "description": "## 리플렉션이란? 런타임 시간에 객체에 변수 및 메소드를 조작하는 기능을 말합니다.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^22.7.7",
+    "typescript": "^5.6.3"
+  }
+}
