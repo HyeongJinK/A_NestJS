@@ -1,23 +1,17 @@
 https://app.diagrams.net/#G1WKcmjn527qLntCL6Y-t99qy_zFldV_wU#%7B%22pageId%22%3A%22nr4tStIwETOUoV4FrBBQ%22%7D
 
 
-
-
-
-
-
-
-
-
-
 ```ts  
 import { ValidationPipe } from '@nestjs/common';  
 import { NestFactory } from '@nestjs/core';  
 import { AppModule } from './app.module';  
   
 async function bootstrap() {  
-  const app = await NestFactory.create(AppModule);  app.useGlobalPipes(new ValidationPipe());  
-  await app.listen(3000);  console.log(`Application is running on: ${await app.getUrl()}`);}  
+  const app = await NestFactory.create(AppModule);  
+  app.useGlobalPipes(new ValidationPipe());  
+  await app.listen(3000);  
+  console.log(`Application is running on: ${await app.getUrl()}`);
+}  
 bootstrap();  
 ```  
 

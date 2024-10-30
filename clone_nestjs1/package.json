@@ -1,0 +1,23 @@
+{
+  "name": "clone_nestjs1",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "express": "^4.21.1",
+    "reflect-metadata": "^0.2.2"
+  },
+  "devDependencies": {
+    "@babel/preset-typescript": "^7.26.0",
+    "@types/express": "^5.0.0",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.8.4",
+    "ts-jest": "^29.2.5",
+    "typescript": "^5.6.3"
+  }
+}
