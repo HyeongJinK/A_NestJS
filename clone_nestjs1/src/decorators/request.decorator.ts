@@ -18,7 +18,7 @@ export function Get(path?: string): MethodDecorator {
         // * */
         // console.log('descriptor.value:', descriptor.value); // descriptor.value: [Function: test]
         Reflect.defineMetadata(PATH_METADATA, path, descriptor.value);
-        Reflect.defineMetadata(METHOD_METADATA, 'GET', descriptor.value);
+        Reflect.defineMetadata(METHOD_METADATA, 'get', descriptor.value);
 
         return descriptor;
     };

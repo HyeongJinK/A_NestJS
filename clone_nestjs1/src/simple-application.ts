@@ -1,12 +1,14 @@
 import express from 'express';
-import {PATH_METADATA} from "./common/constants";
+import {METHOD_METADATA, PATH_METADATA} from "./common/constants";
 
 export class SimpleApplication {
     private app = express();
 
     constructor(controllers: any[]) {
         controllers.forEach((controller) => {
+            const expressRoutes = express.Router()
             const path = Reflect.getMetadata(PATH_METADATA, controller);
+            let controllerIn = new controller();
             console.log('Controller Path:', path);
 
             const routes = Object.getOwnPropertyNames(controller.prototype)
@@ -16,14 +18,14 @@ export class SimpleApplication {
 
             routes.forEach((route) => {
                console.log(`Function Path : ${Reflect.getMetadata(PATH_METADATA, route.value)}`);
+               console.log(`Function Path : ${Reflect.getMetadata(METHOD_METADATA, route.value)}`);
+                const method: string = Reflect.getMetadata(METHOD_METADATA, route.value);
+                console.log(method)
+                expressRoutes['get']('/test', controllerIn[route.value.name]);
             });
 
-            // TODO 라우터와 함수 매핑
+            this.app.use(expressRoutes);
         });
-
-        // this.app.get('/', (req, res) => {
-        //     res.send('Hello World');
-        // });
     }
 
     public async listen(port: number | string, callback?: () => void) {
