@@ -4,6 +4,10 @@ import {MetadataScanner} from "./metadata-scanner";
 import {NestContainer} from "./injector/container";
 import {NestModuleMetatype} from "../common/interfaces/modules/module-metatype.interface";
 import {Logger} from "../common/services/logger.service";
+import {metadata} from "../common/constants";
+import {Module} from "./injector/module";
+import {Metatype} from "../common/interfaces/metatype.interface";
+import {Controller} from "../common/interfaces/controllers/controller.interface";
 // import {NestModuleMetatype} from "../common/interfaces/modules/module-metatype.interface";
 // import {GATEWAY_MIDDLEWARES, GUARDS_METADATA, INTERCEPTORS_METADATA, metadata} from "../common/constants";
 // import {Metatype} from "../common/interfaces/metatype.interface";
@@ -21,17 +25,18 @@ export class DependenciesScanner {
     public scan(module: NestModuleMetatype) {
         this.logger.log(`scan() module: ${module}`);
         this.scanForModules(module);
-        // this.scanModulesForDependencies();
+        this.scanModulesForDependencies();
     }
 
     public scanForModules(module: NestModuleMetatype, scope: NestModuleMetatype[] = []) {
         this.logger.log(`scanForModules() module: ${module}`);
         this.storeModule(module, scope);
 
-        // const importedModules = this.reflectMetadata(module, metadata.MODULES);
-        // importedModules.map((innerModule) => {
-        //     this.scanForModules(innerModule, [].concat(scope, module));
-        // });
+        const importedModules = this.reflectMetadata(module, metadata.MODULES); // metadata.MODULES = 'modules'
+        this.logger.log(`scanForModules() importedModules: ${importedModules}`);
+        importedModules.map((innerModule: any) => {
+            this.scanForModules(innerModule, [...scope, module]);
+        });
     }
 
     public storeModule(module: any, scope: NestModuleMetatype[]) {
@@ -43,37 +48,51 @@ export class DependenciesScanner {
         this.container.addModule(module, scope);
     }
 
-    // public scanModulesForDependencies() {
-    //     const modules = this.container.getModules();
+    public reflectMetadata(metatype: any, metadata: string) {
+        return Reflect.getMetadata(metadata, metatype) || [];
+    }
+
+    public scanModulesForDependencies() {
+        const modules: Map<string, Module> = this.container.getModules();
+
+        modules.forEach(({ metatype }, token: any) => {
+            this.reflectRelatedModules(metatype, token);
+            // this.reflectComponents(metatype, token);
+            this.reflectControllers(metatype, token);
+            // this.reflectExports(metatype, token);
+        });
+    }
+
+    public reflectRelatedModules(module: NestModuleMetatype, token: string) {
+        const modules = this.reflectMetadata(module, metadata.MODULES);
+        this.logger.log(`reflectRelatedModules() modules: ${modules}`);
+        modules.map((related: any) => this.storeRelatedModule(related, token));
+    }
+
+    public storeRelatedModule(related: any, token: string) {
+        this.logger.log(`storeRelatedModule() related: ${related}, token: ${token}`);
+        if (related.forwardRef) {
+            return this.container.addRelatedModule(related.forwardRef(), token);
+        }
+        this.container.addRelatedModule(related, token);
+    }
+
+    public reflectControllers(module: NestModuleMetatype, token: string) {
+        const routes = this.reflectMetadata(module, metadata.CONTROLLERS);
+        this.logger.log(`reflectControllers() routes: ${routes}`);
+        routes.map((route: any) => {
+            this.storeRoute(route, token);
+            // this.reflectDynamicMetadata(route, token);   // gurad, interceptor
+        });
+    }
+
+    public storeRoute(route: Metatype<Controller>, token: string) {
+        this.container.addController(route, token);
+    }
+
+
     //
-    //     modules.forEach(({ metatype }, token) => {
-    //         this.reflectRelatedModules(metatype, token);
-    //         this.reflectComponents(metatype, token);
-    //         this.reflectControllers(metatype, token);
-    //         this.reflectExports(metatype, token);
-    //     });
-    // }
-    //
-    // public reflectControllers(module: NestModuleMetatype, token: string) {
-    //     const routes = this.reflectMetadata(module, metadata.CONTROLLERS);
-    //     routes.map((route) => {
-    //         this.storeRoute(route, token);
-    //         this.reflectDynamicMetadata(route, token);
-    //     });
-    // }
-    //
-    // public storeRoute(route: Metatype<Controller>, token: string) {
-    //     this.container.addController(route, token);
-    // }
-    //
-    // public reflectMetadata(metatype, metadata: string) {
-    //     return Reflect.getMetadata(metadata, metatype) || [];
-    // }
-    //
-    // public reflectRelatedModules(module: NestModuleMetatype, token: string) {
-    //     const modules = this.reflectMetadata(module, metadata.MODULES);
-    //     modules.map((related) => this.storeRelatedModule(related, token));
-    // }
+
     //
     // public reflectComponents(module: NestModuleMetatype, token: string) {
     //     const components = this.reflectMetadata(module, metadata.COMPONENTS);
@@ -130,12 +149,7 @@ export class DependenciesScanner {
     //     return descriptor ? Reflect.getMetadata(key, descriptor.value) : undefined;
     // }
     //
-    // public storeRelatedModule(related: any, token: string) {
-    //     if (related.forwardRef) {
-    //         return this.container.addRelatedModule(related.forwardRef(), token);
-    //     }
-    //     this.container.addRelatedModule(related, token);
-    // }
+
     //
     // public storeComponent(component: Metatype<Injectable>, token: string) {
     //     this.container.addComponent(component, token);

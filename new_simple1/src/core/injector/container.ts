@@ -5,6 +5,8 @@ import {InvalidModuleException} from "../errors/exceptions/invalid-module.except
 import {Module} from "./module";
 import {ModuleTokenFactory} from "./module-token-factory";
 import {Logger} from "../../common/services/logger.service";
+import {UnknownModuleException} from "../errors/exceptions/unknown-module.exception";
+import {Controller} from "../../common/interfaces/controllers/controller.interface";
 
 // import { UnknownModuleException } from '../errors/exceptions/unknown-module.exception';
 // import { ModuleTokenFactory } from './module-token-factory';
@@ -24,30 +26,40 @@ export class NestContainer {
             throw new InvalidModuleException(scope);
         }
         const token = this.moduleTokenFactory.create(metatype, scope);
-        this.logger.log(`addModule() token: ${token}`);
+        this.logger.log(`addModule() token: ${token}`); // addModule() token: {"module":"ApplicationModule","scope":"global"}
         if (this.modules.has(token)) {
             return;
         }
         this.modules.set(token, new Module(metatype, scope));
     }
-    //
-    // public getModules(): Map<string, Module> {
-    //     return this.modules;
-    // }
-    //
-    // public addRelatedModule(relatedModule: NestModuleMetatype, token: string) {
-    //     if (!this.modules.has(token)) return;
-    //
-    //     const module = <Module>this.modules.get(token);
-    //     const parent = module.metatype;
-    //
-    //     const relatedModuleToken = this.moduleTokenFactory.create(
-    //         relatedModule,
-    //         [].concat(module.scope, parent),
-    //     );
-    //     const related: Module = <Module>this.modules.get(relatedModuleToken);
-    //     module.addRelatedModule(related);
-    // }
+
+    public getModules(): Map<string, Module> {
+        return this.modules;
+    }
+
+    public addRelatedModule(relatedModule: NestModuleMetatype, token: string) {
+        if (!this.modules.has(token)) return;
+
+        const module: Module = <Module>this.modules.get(token);
+        const parent = module.metatype;
+
+        const relatedModuleToken = this.moduleTokenFactory.create(
+            relatedModule,
+            [...module.scope, parent],
+        );
+        const related: Module = <Module>this.modules.get(relatedModuleToken);
+        module.addRelatedModule(related);
+    }
+
+    public addController(controller: Metatype<Controller>, token: string) {
+        if (!this.modules.has(token)) {
+            throw new UnknownModuleException();
+        }
+        const module = this.modules.get(token);
+        module && module.addRoute(controller);
+    }
+
+
     //
     // public addComponent(component: Metatype<Injectable>, token: string) {
     //     if (!this.modules.has(token)) {
@@ -74,13 +86,7 @@ export class NestContainer {
     //     module.addExportedComponent(exportedComponent);
     // }
     //
-    // public addController(controller: Metatype<Controller>, token: string) {
-    //     if (!this.modules.has(token)) {
-    //         throw new UnknownModuleException();
-    //     }
-    //     const module = this.modules.get(token);
-    //     module && module.addRoute(controller);
-    // }
+
     //
     // public clear() {
     //     this.modules.clear();
