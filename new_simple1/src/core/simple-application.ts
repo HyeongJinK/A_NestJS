@@ -1,5 +1,5 @@
 import express from 'express';
-import {METHOD_METADATA, PATH_METADATA} from "./common/constants";
+import {METHOD_METADATA, PATH_METADATA} from "../common/constants";
 
 export class SimpleApplication {
     private app = express();
