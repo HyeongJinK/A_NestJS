@@ -1,4 +1,5 @@
-import * as express from 'express';
+// import * as express from 'express';
+import express from 'express';
 
 export class ExpressAdapter {
     public static create(): any {

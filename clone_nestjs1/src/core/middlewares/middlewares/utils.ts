@@ -1,5 +1,8 @@
-import { isFunction } from '@nestjs/common/utils/shared.utils';
-import { Metatype } from '@nestjs/common/interfaces';
+// import { isFunction } from '@nestjs/common/utils/shared.utils';
+// import { Metatype } from '@nestjs/common/interfaces';
+
+import {Metatype} from "../../../common/interfaces/metatype.interface";
+import {isFunction} from "../../../common/utils/shared.utils";
 
 export const filterMiddlewares = (middlewares) => {
     return [].concat(middlewares)

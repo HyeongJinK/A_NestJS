@@ -1,10 +1,16 @@
 import 'reflect-metadata';
 import iterate from 'iterare';
-import { Controller, PipeTransform, Transform } from '@nestjs/common/interfaces';
-import { PIPES_METADATA } from '@nestjs/common/constants';
-import { isUndefined, isFunction, isEmpty } from '@nestjs/common/utils/shared.utils';
-import { ApplicationConfig } from './../application-config';
-import { ContextCreator } from './../helpers/context-creator';
+import {ContextCreator} from "../helpers/context-creator";
+import {ApplicationConfig} from "../application-config";
+import {Controller} from "../../common/interfaces/controllers/controller.interface";
+import {PIPES_METADATA} from "../../common/constants";
+import {isEmpty, isFunction, isUndefined} from "../../common/utils/shared.utils";
+import {Transform} from "../../common/interfaces/pipe-transform.interface";
+// import { Controller, PipeTransform, Transform } from '@nestjs/common/interfaces';
+// import { PIPES_METADATA } from '@nestjs/common/constants';
+// import { isUndefined, isFunction, isEmpty } from '@nestjs/common/utils/shared.utils';
+// import { ApplicationConfig } from './../application-config';
+// import { ContextCreator } from './../helpers/context-creator';
 
 export class PipesContextCreator extends ContextCreator {
     constructor(private readonly config?: ApplicationConfig) {

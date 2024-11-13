@@ -1,6 +1,9 @@
-import { Transform, Paramtype } from '@nestjs/common/interfaces';
-import { RouteParamtypes } from '@nestjs/common/enums/route-paramtypes.enum';
-import { ParamsTokenFactory } from './../pipes/params-token-factory';
+// import { Transform, Paramtype } from '@nestjs/common/interfaces';
+// import { RouteParamtypes } from '@nestjs/common/enums/route-paramtypes.enum';
+// import { ParamsTokenFactory } from './../pipes/params-token-factory';
+
+import {ParamsTokenFactory} from "./params-token-factory";
+import {Transform} from "../../common/interfaces/pipe-transform.interface";
 
 export class PipesConsumer {
     private readonly paramsTokenFactory = new ParamsTokenFactory();

@@ -1,5 +1,8 @@
-import { RouteParamtypes } from '@nestjs/common/enums/route-paramtypes.enum';
-import { Paramtype } from '@nestjs/common';
+// import { RouteParamtypes } from '@nestjs/common/enums/route-paramtypes.enum';
+// import { Paramtype } from '@nestjs/common';
+
+import {RouteParamtypes} from "../../common/enums/route-paramtypes.enum";
+import {Paramtype} from "../../common/interfaces/paramtype.interface";
 
 export class ParamsTokenFactory {
     public exchangeEnumForString(type: RouteParamtypes): Paramtype {
