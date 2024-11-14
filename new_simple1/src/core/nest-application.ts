@@ -4,14 +4,16 @@ import {INestApplication} from "../common/interfaces/nest-application.interface"
 import {Logger} from "../common/services/logger.service";
 import {NestContainer} from "./injector/container";
 import {ApplicationConfig} from "./application-config";
+import {ExpressAdapter} from "./adapters/express-adapter";
+import {RoutesResolver} from "./router/routes-resolver";
+import {Resolver} from "./router/interfaces/resolver.interface";
+
 // import iterate from 'iterare';
 // import * as optional from 'optional';
 // import {MiddlewaresModule} from "./middlewares/middlewares/middlewares-module";
 // import {MiddlewaresContainer} from "./middlewares/middlewares/container";
-// import {Resolver} from "./router/interfaces/resolver.interface";
 // import {ApplicationConfig} from "./application-config";
 // import {NestContainer} from "./injector/container";
-// import {RoutesResolver} from "./router/routes-resolver";
 // import {ExpressAdapter} from "./adapters/express-adapter";
 // import {messages} from "./constants";
 // import {isNil, isUndefined, validatePath} from "../common/utils/shared.utils";
@@ -28,7 +30,7 @@ export class NestApplication implements INestApplication {
     private readonly logger = new Logger(NestApplication.name, true);
     private readonly config: ApplicationConfig;
     private isInitialized = false;
-
+    private readonly routesResolver: Resolver = null;
 
     // private readonly middlewaresModule = new MiddlewaresModule();
     // private readonly middlewaresContainer = new MiddlewaresContainer();
@@ -40,7 +42,7 @@ export class NestApplication implements INestApplication {
     //   : null;
     //
     private readonly httpServer: http.Server = null;
-    // private readonly routesResolver: Resolver = null;
+
 
     // private readonly microservices = [];
 
@@ -56,9 +58,9 @@ export class NestApplication implements INestApplication {
         //this.config = new ApplicationConfig(ioAdapter);
         this.config = new ApplicationConfig();
 
-        // this.routesResolver = new RoutesResolver(
-        //     container, ExpressAdapter, this.config,
-        // );
+        this.routesResolver = new RoutesResolver(
+            container, ExpressAdapter, this.config,
+        );
     }
 
     public setupParserMiddlewares() {
