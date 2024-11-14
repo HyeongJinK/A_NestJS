@@ -102,12 +102,12 @@ export class NestContainer {
 export interface InstanceWrapper<T> {
     name: any;
     metatype: Metatype<T>;
-    instance: T | null;
-    isResolved: boolean | undefined;
-    isPending?: boolean | undefined;
-    done$?: Promise<void> | undefined;
-    inject?: Metatype<any>[] | undefined;
-    isNotMetatype?: boolean | undefined;
-    forwardRef?: boolean | undefined;
-    async?: boolean | undefined;
+    instance: T;
+    isResolved: boolean;
+    isPending?: boolean;
+    done$?: Promise<void>;
+    inject?: Metatype<any>[];
+    isNotMetatype?: boolean;
+    forwardRef?: boolean;
+    async?: boolean;
 }

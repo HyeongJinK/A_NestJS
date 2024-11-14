@@ -5,7 +5,8 @@ import {ExceptionsZone} from "./errors/exceptions-zone";
 import {NestContainer} from "./injector/container";
 import {messages} from "./constants";
 import {ExpressAdapter} from "./adapters/express-adapter";
-import {INestApplication} from "../common/interfaces/nest-application.interface";
+import {InstanceLoader} from "./injector/instance-loader";
+// import {INestApplication} from "../common/interfaces/nest-application.interface";
 // import {NestApplication} from "./nest-application";
 // import {InstanceLoader} from "./injector/instance-loader";
 // import {isFunction} from "../common/utils/shared.utils";
@@ -17,7 +18,7 @@ export class NestFactoryStatic {
     private dependenciesScanner = new DependenciesScanner(
         this.container, new MetadataScanner(),
     );
-    // private instanceLoader = new InstanceLoader(this.container);
+    private instanceLoader = new InstanceLoader(this.container);
 
     /**
      */
@@ -37,7 +38,7 @@ export class NestFactoryStatic {
             this.logger.log(messages.APPLICATION_START);
             await ExceptionsZone.asyncRun(async () => {
                 this.dependenciesScanner.scan(module);
-                // await this.instanceLoader.createInstancesOfDependencies();
+                await this.instanceLoader.createInstancesOfDependencies();
             });
         }
         catch (e) {

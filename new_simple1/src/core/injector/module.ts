@@ -41,9 +41,10 @@ export class Module {
     private _relatedModules = new Set<Module>();
     private _components = new Map<any, InstanceWrapper<Injectable>>();
     private _routes = new Map<string, InstanceWrapper<Controller>>();
+    private _exports = new Set<string>();
 
     // private _injectables = new Map<any, InstanceWrapper<Injectable>>();
-    // private _exports = new Set<string>();
+
 
     constructor(
         private _metatype: NestModuleMetatype,
@@ -122,31 +123,31 @@ export class Module {
         });
     }
 
+    get routes(): Map<string, InstanceWrapper<Controller>> {
+        return this._routes;
+    }
+
+    get components(): Map<string, InstanceWrapper<Injectable>> {
+        return this._components;
+    }
+
+    get relatedModules(): Set<Module> {
+        return this._relatedModules;
+    }
+
+    get exports(): Set<string> {
+        return this._exports;
+    }
 
 
-
-
-
-    //
-    // get relatedModules(): Set<Module> {
-    //     return this._relatedModules;
-    // }
-    //
-    // get components(): Map<string, InstanceWrapper<Injectable>> {
-    //     return this._components;
-    // }
     //
     // get injectables(): Map<string, InstanceWrapper<Injectable>> {
     //     return this._injectables;
     // }
     //
-    // get routes(): Map<string, InstanceWrapper<Controller>> {
-    //     return this._routes;
-    // }
+
     //
-    // get exports(): Set<string> {
-    //     return this._exports;
-    // }
+
     //
     // get instance(): NestModule | undefined {
     //     if (!this._components.has(this._metatype.name)) {
