@@ -7,15 +7,15 @@
 export interface INestApplication {
 
     init(): Promise<void>;
-    use(requestHandler: any): void;
+    //use(requestHandler: any): void;
     listen(port: number, callback?: () => void): Promise<any>;
-    listen(port: number, hostname: string, callback?: () => void): Promise<any>;
-    listenAsync(port: number, hostname?: string): Promise<any>;
-    setGlobalPrefix(prefix: string): void;
+    //listen(port: number, hostname: string, callback?: () => void): Promise<any>;
+    //listenAsync(port: number, hostname?: string): Promise<any>;
+    //setGlobalPrefix(prefix: string): void;
     // useWebSocketAdapter(adapter: WebSocketAdapter): void;
     // useGlobalFilters(...filters: ExceptionFilter[]);
     // useGlobalPipes(...pipes: PipeTransform<any>[]);
     // useGlobalInterceptors(...interceptors: NestInterceptor[]);
     // useGlobalGuards(...guards: CanActivate[]);
-    close(): void;
+    //close(): void;
 }

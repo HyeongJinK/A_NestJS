@@ -6,11 +6,9 @@ import {NestContainer} from "./injector/container";
 import {messages} from "./constants";
 import {ExpressAdapter} from "./adapters/express-adapter";
 import {InstanceLoader} from "./injector/instance-loader";
-// import {INestApplication} from "../common/interfaces/nest-application.interface";
-// import {NestApplication} from "./nest-application";
-// import {InstanceLoader} from "./injector/instance-loader";
-// import {isFunction} from "../common/utils/shared.utils";
-
+import {INestApplication} from "../common/interfaces/nest-application.interface";
+import {NestApplication} from "./nest-application";
+import {isFunction} from "../common/shared.utils";
 
 export class NestFactoryStatic {
     private container = new NestContainer();
@@ -22,14 +20,12 @@ export class NestFactoryStatic {
 
     /**
      */
-    public async create(module: any, express = ExpressAdapter.create())
-    //    : Promise<INestApplication>
-    {
+    public async create(module: any, express = ExpressAdapter.create()): Promise<INestApplication> {
         this.logger.log(`create() parameter module: ${module}`);
         await this.initialize(module);
-        // return this.createNestInstance<NestApplication>(
-        //     new NestApplication(this.container, express),
-        // );
+        return this.createNestInstance<NestApplication>(
+            new NestApplication(this.container, express),
+        );
 
     }
 
@@ -46,38 +42,38 @@ export class NestFactoryStatic {
         }
     }
 
+    /**
+     * Creates NestApplication
+     */
+    private createNestInstance<T>(instance: T) {
+        return this.createProxy(instance);
+    }
 
+    private createProxy(target) {
+        const proxy = this.createExceptionProxy();
+        return new Proxy(target, {
+            get: proxy,
+            set: proxy,
+        });
+    }
 
+    private createExceptionProxy() {
+        return (receiver, prop) => {
+            if (!(prop in receiver))
+                return;
 
-    // private createNestInstance<T>(instance: T) {
-    //     return this.createProxy(instance);
-    // }
-    //
-    // private createProxy(target) {
-    //     const proxy = this.createExceptionProxy();
-    //     return new Proxy(target, {
-    //         get: proxy,
-    //         set: proxy,
-    //     });
-    // }
-    //
-    // private createExceptionProxy() {
-    //     return (receiver, prop) => {
-    //         if (!(prop in receiver))
-    //             return;
-    //
-    //         if (isFunction(receiver[prop])) {
-    //             return (...args) => {
-    //                 let result;
-    //                 ExceptionsZone.run(() => {
-    //                     result = receiver[prop](...args);
-    //                 });
-    //                 return result;
-    //             };
-    //         }
-    //         return receiver[prop];
-    //     };
-    // }
+            if (isFunction(receiver[prop])) {
+                return (...args) => {
+                    let result;
+                    ExceptionsZone.run(() => {
+                        result = receiver[prop](...args);
+                    });
+                    return result;
+                };
+            }
+            return receiver[prop];
+        };
+    }
 }
 
 export const NestFactory = new NestFactoryStatic();
