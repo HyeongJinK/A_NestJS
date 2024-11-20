@@ -1,9 +1,3 @@
-// import { NestModuleMetatype } from '@nestjs/common/interfaces/modules/module-metatype.interface';
-// import { SHARED_MODULE_METADATA } from '@nestjs/common/constants';
-
-// import {NestModuleMetatype} from "../../common/interfaces/modules/module-metatype.interface";
-// import {SHARED_MODULE_METADATA} from "../../common/constants";
-
 import {NestModuleMetatype} from "../../common/interfaces/modules/module-metatype.interface";
 import {SHARED_MODULE_METADATA} from "../../common/constants";
 

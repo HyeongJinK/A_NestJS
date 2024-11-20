@@ -284,34 +284,4 @@ export class Injector {
     const result = await factoryResult;
     return result;
   }
-
-
-
-
-
-
-  // public async loadInstanceOfMiddleware(
-  //   wrapper: MiddlewareWrapper,
-  //   collection: Map<string, MiddlewareWrapper>,
-  //   module: Module) {
-  //
-  //   const { metatype } = wrapper;
-  //   const currentMetatype = collection.get(metatype.name);
-  //   if (currentMetatype.instance !== null) return;
-  //
-  //   await this.resolveConstructorParams(wrapper as any, module, null, null, (instances) => {
-  //     collection.set(metatype.name, {
-  //       instance: new metatype(...instances),
-  //       metatype,
-  //     });
-  //   });
-  // }
-  //
-
-  //
-  // public async loadInstanceOfInjectable(wrapper: InstanceWrapper<Controller>, module: Module) {
-  //   const injectables = module.injectables;
-  //   await this.loadInstance<Controller>(wrapper, injectables, module);
-  // }
-  //
 }

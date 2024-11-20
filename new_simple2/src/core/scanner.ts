@@ -1,6 +1,5 @@
 import 'reflect-metadata';
 
-import {MetadataScanner} from "./metadata-scanner";
 import {NestContainer} from "./injector/container";
 import {NestModuleMetatype} from "../common/interfaces/modules/module-metatype.interface";
 import {Logger} from "../common/services/logger.service";
@@ -8,19 +7,12 @@ import {metadata} from "../common/constants";
 import {Module} from "./injector/module";
 import {Metatype} from "../common/interfaces/metatype.interface";
 import {Controller} from "../common/interfaces/controllers/controller.interface";
-// import {NestModuleMetatype} from "../common/interfaces/modules/module-metatype.interface";
-// import {GATEWAY_MIDDLEWARES, GUARDS_METADATA, INTERCEPTORS_METADATA, metadata} from "../common/constants";
-// import {Metatype} from "../common/interfaces/metatype.interface";
-// import {Injectable} from "../common/interfaces/injectable.interface";
-// import {Controller} from "../common/interfaces/controllers/controller.interface";
-
 
 export class DependenciesScanner {
     private logger = new Logger('DependenciesScanner', true);
 
     constructor(
-        private readonly container: NestContainer,
-        private readonly metadataScanner: MetadataScanner) {}
+        private readonly container: NestContainer) {}
 
     public scan(module: NestModuleMetatype) {
         this.logger.log(`scan() module: ${module}`);
@@ -57,9 +49,7 @@ export class DependenciesScanner {
 
         modules.forEach(({ metatype }, token: any) => {
             this.reflectRelatedModules(metatype, token);
-            // this.reflectComponents(metatype, token);
             this.reflectControllers(metatype, token);
-            // this.reflectExports(metatype, token);
         });
     }
 
@@ -82,84 +72,10 @@ export class DependenciesScanner {
         this.logger.log(`reflectControllers() routes: ${routes}`);
         routes.map((route: any) => {
             this.storeRoute(route, token);
-            // this.reflectDynamicMetadata(route, token);   // gurad, interceptor
         });
     }
 
     public storeRoute(route: Metatype<Controller>, token: string) {
         this.container.addController(route, token);
     }
-
-
-    //
-
-    //
-    // public reflectComponents(module: NestModuleMetatype, token: string) {
-    //     const components = this.reflectMetadata(module, metadata.COMPONENTS);
-    //     components.map((component) => {
-    //         this.storeComponent(component, token);
-    //         this.reflectComponentMetadata(component, token);
-    //         this.reflectDynamicMetadata(component, token);
-    //     });
-    // }
-    //
-    // public reflectComponentMetadata(component: Metatype<Injectable>, token: string) {
-    //     this.reflectGatewaysMiddlewares(component, token);
-    // }
-    //
-    //
-    //
-    // public reflectDynamicMetadata(obj: Metatype<Injectable>, token: string) {
-    //     if (!obj.prototype) { return; }
-    //
-    //     this.reflectGuards(obj, token);
-    //     this.reflectInterceptors(obj, token);
-    // }
-    //
-    // public reflectExports(module: NestModuleMetatype, token: string) {
-    //     const exports = this.reflectMetadata(module, metadata.EXPORTS);
-    //     exports.map((exportedComponent) => this.storeExportedComponent(exportedComponent, token));
-    // }
-    //
-    // public reflectGatewaysMiddlewares(component: Metatype<Injectable>, token: string) {
-    //     const middlewares = this.reflectMetadata(component, GATEWAY_MIDDLEWARES);
-    //     middlewares.map((middleware) => this.storeComponent(middleware, token));
-    // }
-    //
-    // public reflectGuards(component: Metatype<Injectable>, token: string) {
-    //     const controllerGuards = this.reflectMetadata(component, GUARDS_METADATA);
-    //     const methodsGuards = this.metadataScanner.scanFromPrototype(
-    //       null, component.prototype, this.reflectKeyMetadata.bind(this, component, GUARDS_METADATA),
-    //     );
-    //     const flattenMethodsGuards = methodsGuards.reduce<any[]>((a: any[], b) => a.concat(b), []);
-    //     [...controllerGuards, ...flattenMethodsGuards].map((guard) => this.storeInjectable(guard, token));
-    // }
-    //
-    // public reflectInterceptors(component: Metatype<Injectable>, token: string) {
-    //     const controllerInterceptors = this.reflectMetadata(component, INTERCEPTORS_METADATA);
-    //     const methodsInterceptors = this.metadataScanner.scanFromPrototype(
-    //       null, component.prototype, this.reflectKeyMetadata.bind(this, component, INTERCEPTORS_METADATA),
-    //     );
-    //     const flattenMethodsInterceptors = methodsInterceptors.reduce<any[]>((a: any[], b) => a.concat(b), []);
-    //     [...controllerInterceptors, ...flattenMethodsInterceptors].map((guard) => this.storeInjectable(guard, token));
-    // }
-    //
-    // public reflectKeyMetadata(component: Metatype<Injectable>, key: string, method: string) {
-    //     const descriptor = Reflect.getOwnPropertyDescriptor(component.prototype, method);
-    //     return descriptor ? Reflect.getMetadata(key, descriptor.value) : undefined;
-    // }
-    //
-
-    //
-    // public storeComponent(component: Metatype<Injectable>, token: string) {
-    //     this.container.addComponent(component, token);
-    // }
-    //
-    // public storeInjectable(component: Metatype<Injectable>, token: string) {
-    //     this.container.addInjectable(component, token);
-    // }
-    //
-    // public storeExportedComponent(exportedComponent: Metatype<Injectable>, token: string) {
-    //     this.container.addExportedComponent(exportedComponent, token);
-    // }
 }

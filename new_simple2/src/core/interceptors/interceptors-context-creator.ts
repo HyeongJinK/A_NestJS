@@ -52,11 +52,4 @@ export class InterceptorsContextCreator extends ContextCreator {
         }
         return module.injectables.get((metatype as any).name);
     }
-    //
-    // public getGlobalMetadata<T extends any[]>(): T {
-    //     if (!this.config) {
-    //         return [] as T;
-    //     }
-    //     return this.config.getGlobalInterceptors() as T;
-    // }
 }

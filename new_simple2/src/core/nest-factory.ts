@@ -1,6 +1,5 @@
 import {Logger} from "../common/services/logger.service";
 import {DependenciesScanner} from "./scanner";
-import {MetadataScanner} from "./metadata-scanner";
 import {ExceptionsZone} from "./errors/exceptions-zone";
 import {NestContainer} from "./injector/container";
 import {messages} from "./constants";
@@ -13,9 +12,7 @@ import {isFunction} from "../common/shared.utils";
 export class NestFactoryStatic {
     private container = new NestContainer();
     private logger = new Logger('NestFactory', true);
-    private dependenciesScanner = new DependenciesScanner(
-        this.container, new MetadataScanner(),
-    );
+    private dependenciesScanner = new DependenciesScanner(this.container);
     private instanceLoader = new InstanceLoader(this.container);
 
     /**
