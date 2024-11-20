@@ -5,17 +5,17 @@ export class ApplicationConfig implements ConfigurationProvider {
     // private globalFilters: ExceptionFilter[] = [];
     // private globalInterceptors: NestInterceptor[] = [];
     // private globalGuards: CanActivate[] = [];
-    // private globalPrefix = '';
+    private globalPrefix = '';
     //
     // constructor(private ioAdapter: WebSocketAdapter | null = null) {}
     //
-    // public setGlobalPrefix(prefix: string) {
-    //     this.globalPrefix = prefix;
-    // }
-    //
-    // public getGlobalPrefix() {
-    //     return this.globalPrefix;
-    // }
+    public setGlobalPrefix(prefix: string) {
+        this.globalPrefix = prefix;
+    }
+
+    public getGlobalPrefix() {
+        return this.globalPrefix;
+    }
     //
     // public setIoAdapter(ioAdapter: WebSocketAdapter) {
     //     this.ioAdapter = ioAdapter;

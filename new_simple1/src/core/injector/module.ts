@@ -43,7 +43,7 @@ export class Module {
     private _routes = new Map<string, InstanceWrapper<Controller>>();
     private _exports = new Set<string>();
 
-    // private _injectables = new Map<any, InstanceWrapper<Injectable>>();
+    private _injectables = new Map<any, InstanceWrapper<Injectable>>();
 
 
     constructor(
@@ -139,11 +139,9 @@ export class Module {
         return this._exports;
     }
 
-
-    //
-    // get injectables(): Map<string, InstanceWrapper<Injectable>> {
-    //     return this._injectables;
-    // }
+    get injectables(): Map<string, InstanceWrapper<Injectable>> {
+        return this._injectables;
+    }
     //
 
     //

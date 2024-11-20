@@ -1,12 +1,16 @@
 import iterate from 'iterare';
-import { GUARDS_METADATA } from '@nestjs/common/constants';
-import { isUndefined, isFunction, isNil, isEmpty } from '@nestjs/common/utils/shared.utils';
-import { Controller } from '@nestjs/common/interfaces';
-import { HttpStatus, ExecutionContext, NestInterceptor } from '@nestjs/common';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/toPromise';
-import 'rxjs/add/observable/defer';
-import 'rxjs/add/operator/take';
+import {Controller} from "../../common/interfaces/controllers/controller.interface";
+import {NestInterceptor} from "../../common/interfaces/nest-interceptor.interface";
+import {isEmpty} from "../../common/utils/shared.utils";
+import {Observable} from "rxjs";
+// import { GUARDS_METADATA } from '@nestjs/common/constants';
+// import { isUndefined, isFunction, isNil, isEmpty } from '@nestjs/common/utils/shared.utils';
+// import { Controller } from '@nestjs/common/interfaces';
+// import { HttpStatus, ExecutionContext, NestInterceptor } from '@nestjs/common';
+// import { Observable } from 'rxjs/Observable';
+// import 'rxjs/add/operator/toPromise';
+// import 'rxjs/add/observable/defer';
+// import 'rxjs/add/operator/take';
 
 export class InterceptorsConsumer {
     public async intercept(

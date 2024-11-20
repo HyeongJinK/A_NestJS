@@ -13,9 +13,12 @@ import {ExceptionsFilter} from "./interfaces/exceptions-filter.interface";
 import {RequestMethod} from "../../common/enums/request-method.enum";
 import {Controller} from "../../common/interfaces/controllers/controller.interface";
 import {Metatype} from "../../common/interfaces/metatype.interface";
-import {PATH_METADATA} from "../../common/constants";
+import {METHOD_METADATA, PATH_METADATA} from "../../common/constants";
 import {isUndefined, validatePath} from "../../common/shared.utils";
 import {UnknownRequestMappingException} from "../errors/exceptions/unknown-request-mapping.exception";
+import {PipesConsumer} from "../pipes/pipes-consumer";
+import {InterceptorsConsumer} from "../interceptors/interceptors-consumer";
+import {InterceptorsContextCreator} from "../interceptors/interceptors-context-creator";
 // import {RouterExplorer} from "./interfaces/explorer.inteface";
 // import {RouterExecutionContext} from "./router-execution-context";
 // import {RouterMethodFactory} from "../helpers/router-method-factory";
@@ -56,21 +59,25 @@ export class ExpressRouterExplorer implements RouterExplorer {
         container?: NestContainer) {
 
         this.executionContextCreator = new RouterExecutionContext(
-            new RouteParamsFactory()
+            new RouteParamsFactory(),
+
+            // 파이프
             // new PipesContextCreator(config),
-            // new PipesConsumer(),
+            new PipesConsumer(),
+            // 가드
             // new GuardsContextCreator(container, config),
             // new GuardsConsumer(),
-            // new InterceptorsContextCreator(container, config),
-            // new InterceptorsConsumer(),
+            // 인터셉터
+            new InterceptorsContextCreator(container, config),
+            new InterceptorsConsumer(),
         );
     }
 
     public explore(instance: Controller, metatype: Metatype<Controller>, module: string) {
         const router = (this.expressAdapter as any).createRouter();
-        // const routerPaths = this.scanForPaths(instance);
-        //
-        // this.applyPathsToRouterProxy(router, routerPaths, instance, module);
+        const routerPaths = this.scanForPaths(instance);
+
+        this.applyPathsToRouterProxy(router, routerPaths, instance, module);
         return router;
     }
 
@@ -85,64 +92,64 @@ export class ExpressRouterExplorer implements RouterExplorer {
         }
         return validatePath(path);
     }
-    //
-    // public scanForPaths(instance: Controller, prototype?): RoutePathProperties[] {
-    //     const instancePrototype = isUndefined(prototype) ? Object.getPrototypeOf(instance) : prototype;
-    //     return this.metadataScanner.scanFromPrototype<Controller, RoutePathProperties>(
-    //         instance,
-    //         instancePrototype,
-    //         (method) => this.exploreMethodMetadata(instance, instancePrototype, method),
-    //     );
-    // }
-    //
-    // public exploreMethodMetadata(instance: Controller, instancePrototype, methodName: string): RoutePathProperties {
-    //     const targetCallback = instancePrototype[methodName];
-    //     const routePath = Reflect.getMetadata(PATH_METADATA, targetCallback);
-    //     if (isUndefined(routePath)) {
-    //         return null;
-    //     }
-    //
-    //     const requestMethod: RequestMethod = Reflect.getMetadata(METHOD_METADATA, targetCallback);
-    //     return {
-    //         path: this.validateRoutePath(routePath),
-    //         requestMethod,
-    //         targetCallback,
-    //         methodName,
-    //     };
-    // }
-    //
-    // public applyPathsToRouterProxy(
-    //     router,
-    //     routePaths: RoutePathProperties[],
-    //     instance: Controller,
-    //     module: string) {
-    //
-    //     (routePaths || []).map((pathProperties) => {
-    //         const { path, requestMethod } = pathProperties;
-    //         this.applyCallbackToRouter(router, pathProperties, instance, module);
-    //         this.logger.log(RouteMappedMessage(path, requestMethod));
-    //     });
-    // }
-    //
-    // private applyCallbackToRouter(
-    //     router,
-    //     pathProperties: RoutePathProperties,
-    //     instance: Controller,
-    //     module: string) {
-    //
-    //     const { path, requestMethod, targetCallback, methodName } = pathProperties;
-    //
-    //     const routerMethod = this.routerMethodFactory.get(router, requestMethod).bind(router);
-    //     const proxy = this.createCallbackProxy(instance, targetCallback, methodName, module, requestMethod);
-    //     routerMethod(path, proxy);
-    // }
-    //
-    // private createCallbackProxy(instance: Controller, callback: RouterProxyCallback, methodName: string, module: string, requestMethod) {
-    //     const executionContext = this.executionContextCreator.create(instance, callback, methodName, module, requestMethod);
-    //     const exceptionFilter = this.exceptionsFilter.create(instance, callback);
-    //
-    //     return this.routerProxy.createProxy(executionContext, exceptionFilter);
-    // }
+
+    public scanForPaths(instance: Controller, prototype?): RoutePathProperties[] {
+        const instancePrototype = isUndefined(prototype) ? Object.getPrototypeOf(instance) : prototype;
+        return this.metadataScanner.scanFromPrototype<Controller, RoutePathProperties>(
+            instance,
+            instancePrototype,
+            (method) => this.exploreMethodMetadata(instance, instancePrototype, method),
+        );
+    }
+
+    public exploreMethodMetadata(instance: Controller, instancePrototype, methodName: string): RoutePathProperties {
+        const targetCallback = instancePrototype[methodName];
+        const routePath = Reflect.getMetadata(PATH_METADATA, targetCallback);
+        if (isUndefined(routePath)) {
+            return null;
+        }
+
+        const requestMethod: RequestMethod = Reflect.getMetadata(METHOD_METADATA, targetCallback);
+        return {
+            path: this.validateRoutePath(routePath),
+            requestMethod,
+            targetCallback,
+            methodName,
+        };
+    }
+
+    public applyPathsToRouterProxy(
+        router,
+        routePaths: RoutePathProperties[],
+        instance: Controller,
+        module: string) {
+
+        (routePaths || []).map((pathProperties) => {
+            const { path, requestMethod } = pathProperties;
+            this.applyCallbackToRouter(router, pathProperties, instance, module);
+            // this.logger.log(RouteMappedMessage(path, requestMethod));
+        });
+    }
+
+    private applyCallbackToRouter(
+        router,
+        pathProperties: RoutePathProperties,
+        instance: Controller,
+        module: string) {
+
+        const { path, requestMethod, targetCallback, methodName } = pathProperties;
+
+        const routerMethod = this.routerMethodFactory.get(router, requestMethod).bind(router);  // 메서드 가져오기
+        const proxy = this.createCallbackProxy(instance, targetCallback, methodName, module, requestMethod);
+        routerMethod(path, proxy);
+    }
+
+    private createCallbackProxy(instance: Controller, callback: RouterProxyCallback, methodName: string, module: string, requestMethod) {
+        const executionContext = this.executionContextCreator.create(instance, callback, methodName, module, requestMethod);
+        const exceptionFilter = this.exceptionsFilter.create(instance, callback);
+
+        return this.routerProxy.createProxy(executionContext, exceptionFilter);
+    }
 }
 
 export interface RoutePathProperties {

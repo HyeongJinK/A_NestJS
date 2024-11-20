@@ -12,6 +12,6 @@ export class TestController {
     @Get('/test')
     test() {
         console.log("TestController test");
-
+        return "test";
     }
 }

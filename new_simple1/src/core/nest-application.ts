@@ -7,6 +7,7 @@ import {ApplicationConfig} from "./application-config";
 import {ExpressAdapter} from "./adapters/express-adapter";
 import {RoutesResolver} from "./router/routes-resolver";
 import {Resolver} from "./router/interfaces/resolver.interface";
+import {validatePath} from "../common/shared.utils";
 
 // import iterate from 'iterare';
 // import * as optional from 'optional';
@@ -78,45 +79,42 @@ export class NestApplication implements INestApplication {
     }
 
     public async init() {
-        // await this.setupModules();
-        // await this.setupRouter();
+        await this.setupModules();
+        await this.setupRouter();
         //
         // this.callInitHook();
         this.logger.log(`Nest application successfully started`);
         this.isInitialized = true;
     }
 
+    public async setupModules() {
+        // 소켓
+        // this.socketModule && this.socketModule.setup(this.container, this.config);
+        // 마이크로서비스
+        // if (this.microservicesModule) {
+        //   this.microservicesModule.setup(this.container, this.config);
+        //   this.microservicesModule.setupClients(this.container);
+        // }
+        // 미들웨어
+        // await this.middlewaresModule.setup(
+        //   this.middlewaresContainer,
+        //   this.container,
+        //   this.config,
+        // );
+    }
 
+    public async setupRouter() {
+        const router = ExpressAdapter.createRouter();
+        // await this.setupMiddlewares(router); // 미들웨어로 보여서 일단 주석 처리
 
-    //
-    // public async setupModules() {
-    //     this.socketModule && this.socketModule.setup(this.container, this.config);
-    //
-    //     if (this.microservicesModule) {
-    //       this.microservicesModule.setup(this.container, this.config);
-    //       this.microservicesModule.setupClients(this.container);
-    //     }
-    //     await this.middlewaresModule.setup(
-    //       this.middlewaresContainer,
-    //       this.container,
-    //       this.config,
-    //     );
-    // }
-    //
+        this.routesResolver.resolve(router);
+        this.express.use(validatePath(this.config.getGlobalPrefix()), router);
+    }
 
-    //
-    // public async setupRouter() {
-    //     const router = ExpressAdapter.createRouter();
-    //     await this.setupMiddlewares(router);
-    //
-    //     this.routesResolver.resolve(router);
-    //     this.express.use(validatePath(this.config.getGlobalPrefix()), router);
-    // }
-    //
-    // public use(requestHandler) {
-    //     this.express.use(requestHandler);
-    // }
-    //
+    public use(requestHandler) {
+        this.express.use(requestHandler);
+    }
+
 
     //
     // public listenAsync(port: number, hostname?: string): Promise<any> {

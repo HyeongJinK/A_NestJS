@@ -1,13 +1,14 @@
 import { Application } from 'express';
 import {Resolver} from "./interfaces/resolver.interface";
 import {Logger} from "../../common/services/logger.service";
-import {NestContainer} from "../injector/container";
+import {InstanceWrapper, NestContainer} from "../injector/container";
 import {ApplicationConfig} from "../application-config";
 import {RouterExceptionFilters} from "./router-exception-filters";
 import {RouterProxy} from "./router-proxy";
 import {RouterExplorer} from "./interfaces/explorer.inteface";
 import {MetadataScanner} from "../metadata-scanner";
 import {ExpressRouterExplorer} from "./router-explorer";
+import {Controller} from "../../common/interfaces/controllers/controller.interface";
 
 export class RoutesResolver implements Resolver {
     private readonly logger = new Logger(RoutesResolver.name, true);
@@ -28,26 +29,26 @@ export class RoutesResolver implements Resolver {
     }
 
     public resolve(express: Application) {
-        // const modules = this.container.getModules();
-        // modules.forEach(({ routes }, moduleName) => this.setupRouters(routes, moduleName, express));
+        const modules = this.container.getModules();
+        modules.forEach(({ routes }, moduleName) => this.setupRouters(routes, moduleName, express));
     }
-    //
-    // public setupRouters(
-    //     routes: Map<string, InstanceWrapper<Controller>>,
-    //     moduleName: string,
-    //     express: Application) {
-    //
-    //     routes.forEach(({ instance, metatype }) => {
-    //         const path = this.routerBuilder.fetchRouterPath(metatype);
-    //         const controllerName = metatype.name;
-    //
-    //         this.logger.log(ControllerMappingMessage(controllerName, path));
-    //
-    //         const router = this.routerBuilder.explore(instance, metatype, moduleName);
-    //         express.use(path, router);
-    //     });
-    //     this.setupExceptionHandler(express);
-    // }
+
+    public setupRouters(
+        routes: Map<string, InstanceWrapper<Controller>>,
+        moduleName: string,
+        express: Application) {
+
+        routes.forEach(({ instance, metatype }) => {
+            const path = this.routerBuilder.fetchRouterPath(metatype);  // 메타데이터에서 path 가져오기
+            const controllerName = metatype.name;
+
+            this.logger.log(`setupRouters() ${controllerName} {${path}}:`)
+
+            const router = this.routerBuilder.explore(instance, metatype, moduleName);
+            express.use(path, router);
+        });
+        this.setupExceptionHandler(express);
+    }
 
     public setupExceptionHandler(express: Application) {
         const callback = (err, req, res, next) => {
