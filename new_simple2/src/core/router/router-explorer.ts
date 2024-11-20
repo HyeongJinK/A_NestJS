@@ -9,14 +9,12 @@ import {ApplicationConfig} from "../application-config";
 import {NestContainer} from "../injector/container";
 import {RouterExecutionContext} from "./router-execution-context";
 import {RouteParamsFactory} from "./route-params-factory";
-import {ExceptionsFilter} from "./interfaces/exceptions-filter.interface";
 import {RequestMethod} from "../../common/enums/request-method.enum";
 import {Controller} from "../../common/interfaces/controllers/controller.interface";
 import {Metatype} from "../../common/interfaces/metatype.interface";
 import {METHOD_METADATA, PATH_METADATA} from "../../common/constants";
 import {isUndefined, validatePath} from "../../common/shared.utils";
 import {UnknownRequestMappingException} from "../errors/exceptions/unknown-request-mapping.exception";
-import {PipesConsumer} from "../pipes/pipes-consumer";
 import {InterceptorsConsumer} from "../interceptors/interceptors-consumer";
 import {InterceptorsContextCreator} from "../interceptors/interceptors-context-creator";
 
@@ -35,7 +33,6 @@ export class ExpressRouterExplorer implements RouterExplorer {
 
         this.executionContextCreator = new RouterExecutionContext(
             new RouteParamsFactory(),
-            new PipesConsumer(),
             // 인터셉터
             new InterceptorsContextCreator(container, config),
             new InterceptorsConsumer(),
