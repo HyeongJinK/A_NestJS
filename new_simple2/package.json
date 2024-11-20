@@ -1,0 +1,28 @@
+{
+  "name": "new_simple2",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "cli-color": "^2.0.4",
+    "express": "^4.21.1",
+    "iterare": "^1.2.1",
+    "optional": "^0.1.4",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.1"
+  },
+  "devDependencies": {
+    "@babel/preset-typescript": "^7.26.0",
+    "@types/cli-color": "^2.0.6",
+    "@types/express": "^5.0.0",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.8.4",
+    "ts-jest": "^29.2.5",
+    "typescript": "^5.6.3"
+  }
+}
