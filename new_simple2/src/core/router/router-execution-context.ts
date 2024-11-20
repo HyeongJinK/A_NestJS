@@ -55,14 +55,18 @@ export class RouterExecutionContext {
 
         return async (req, res, next) => {
             const args = this.createNullArray(argsLength);
+            this.logger.log(`create() paramsOptions: ${paramsOptions} argsLength: ${argsLength}`);
 
             await Promise.all(paramsOptions.map(async (param) => {
-                const { index, extractValue, type, data, metatype
+                this.logger.log(`create() param: ${JSON.stringify(param)}`);
+                const { index
+                    , extractValue, type, data, metatype
                 } = param;
-                const value = extractValue(req, res, next);
-
+                const value = extractValue(req, res, next); // case RouteParamtypes.QUERY: return data ? req.query[data] : req.query;
+                this.logger.log(`create() value: ${value} extractValue: ${extractValue}`);
                 args[index] = await this.getParamValue(
-                    value, { metatype, type, data }
+                    value
+                    //, { metatype, type, data }
                 );
             }));
             this.logger.log(`create() args: ${args}`);
@@ -134,7 +138,7 @@ export class RouterExecutionContext {
 
     public async getParamValue<T>(
         value: T,
-        { metatype, type, data }
+        // { metatype, type, data }
     ): Promise<any> {
         return Promise.resolve(value);
     }

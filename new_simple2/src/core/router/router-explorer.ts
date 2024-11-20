@@ -120,8 +120,7 @@ export class ExpressRouterExplorer implements RouterExplorer {
         module: string) {
 
         (routePaths || []).map((pathProperties) => {
-            const { path, requestMethod } = pathProperties;
-            this.logger.log(`applyPathsToRouterProxy() ${requestMethod} {${path}}`);
+            // this.logger.log(`applyPathsToRouterProxy() ${pathProperties.requestMethod} {${pathProperties.path}}`);
 
             this.applyCallbackToRouter(router, pathProperties, instance, module);
         });
