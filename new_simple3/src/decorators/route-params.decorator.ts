@@ -13,6 +13,7 @@ export interface RouteParamsMetadata {
   };
 }
 
+// 저장할 데이터 가공
 const assignMetadata = (
   args: RouteParamsMetadata,
   paramtype: RouteParamtypes,
@@ -49,8 +50,7 @@ const createPipesRouteParamDecorator = (paramtype: RouteParamtypes) => (
   const paramData = hasParamData ? data : undefined;
   const paramPipes = hasParamData ? pipes : [data, ...pipes];
 
-  Reflect.defineMetadata(
-    ROUTE_ARGS_METADATA,
+  Reflect.defineMetadata(ROUTE_ARGS_METADATA,
     assignMetadata(args, paramtype, index, paramData, ...paramPipes),
     target,
     key,
@@ -63,12 +63,7 @@ export const Request: () => ParameterDecorator = createRouteParamDecorator(
 export const Response: () => ParameterDecorator = createRouteParamDecorator(
   RouteParamtypes.RESPONSE,
 );
-export const Next: () => ParameterDecorator = createRouteParamDecorator(
-  RouteParamtypes.NEXT,
-);
-export const Session: () => ParameterDecorator = createRouteParamDecorator(
-  RouteParamtypes.SESSION,
-);
+
 export const Headers: (
   property?: string,
 ) => ParameterDecorator = createRouteParamDecorator(RouteParamtypes.HEADERS);

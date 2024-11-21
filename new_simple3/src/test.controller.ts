@@ -2,7 +2,7 @@ import {Controller} from "./decorators/controller.decorator";
 import {Get} from "./decorators/request.decorator";
 import {Param, Query} from "./decorators/route-params.decorator";
 
-@Controller("/")
+@Controller("/abc")
 export class TestController {
     asdfg = "test";
 

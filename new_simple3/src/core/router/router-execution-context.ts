@@ -35,7 +35,7 @@ export class RouterExecutionContext {
         module: ${module} 
         requestMethod: ${requestMethod}`);
         const metadata =  Reflect.getMetadata(ROUTE_ARGS_METADATA, instance, methodName) || {};     // ROUTE_ARGS_METADATA: __routeArguments__
-        const keys = Object.keys(metadata);
+        const keys = Object.keys(metadata); // key = [`${paramtype}:${index}`]   paramtype: RouteParamtypes.QUERY, index: 0
         const argsLength = Math.max(...keys.map(key => metadata[key].index)) + 1;
         const paramtypes = Reflect.getMetadata(PARAMTYPES_METADATA, instance, methodName);  // design:paramtypes
         this.logger.log_blue(`create() paramtypes: ${paramtypes}`);
@@ -71,14 +71,14 @@ export class RouterExecutionContext {
 
     public exchangeKeysForValues(keys: string[], metadata: RouteParamsMetadata): ParamProperties[] {
         return keys.map(key => {
-            const { index, data, pipes } = metadata[key];
-            this.logger.log_blue(`exchangeKeysForValues() index: ${index} data: ${data} pipes: ${pipes} key: ${key}`);
-            const type = this.mapParamType(key);
+            const { index, data } = metadata[key];
+            this.logger.log_blue(`exchangeKeysForValues() index: ${index} data: ${data} key: ${key}`);
+            const type = this.mapParamType(key);    // RouteParamtypes.QUERY:index 에서 인덱스를 제외하고 타입이 어떤 값이 알기 위해 타입값만 가져오기
 
             const extractValue =
                 (req, res, next) => this.exchangeKeyForValue(type, data, { req, res, next });
 
-            return { index, extractValue, type, data, pipes };
+            return { index, extractValue, type, data };
         });
     }
 
@@ -107,7 +107,6 @@ export class RouterExecutionContext {
 
     public async getParamValue<T>(
         value: T,
-        // { metatype, type, data }
     ): Promise<any> {
         return Promise.resolve(value);
     }
