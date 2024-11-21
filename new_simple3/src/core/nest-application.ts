@@ -6,16 +6,15 @@ import {NestContainer} from "./injector/container";
 import {ApplicationConfig} from "./application-config";
 import {ExpressAdapter} from "./adapters/express-adapter";
 import {RoutesResolver} from "./router/routes-resolver";
-import {Resolver} from "./router/interfaces/resolver.interface";
 import {validatePath} from "../common/shared.utils";
 
 
 export class NestApplication implements INestApplication {
     private readonly logger = new Logger(NestApplication.name, true);
     private readonly config: ApplicationConfig;
-    private isInitialized = false;
-    private readonly routesResolver: Resolver = null;
+    private readonly routesResolver: RoutesResolver = null;
     private readonly httpServer: http.Server = null;
+    private isInitialized = false;
 
     constructor(
         private readonly container: NestContainer,

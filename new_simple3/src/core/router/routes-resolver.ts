@@ -4,27 +4,28 @@ import {Logger} from "../../common/services/logger.service";
 import {InstanceWrapper, NestContainer} from "../injector/container";
 import {ApplicationConfig} from "../application-config";
 import {RouterProxy} from "./router-proxy";
-import {RouterExplorer} from "./interfaces/explorer.inteface";
 import {MetadataScanner} from "../metadata-scanner";
 import {ExpressRouterExplorer} from "./router-explorer";
 import {Controller} from "../../common/interfaces/controllers/controller.interface";
+import {Metatype} from "../../common/interfaces/metatype.interface";
+import {PATH_METADATA} from "../../common/constants";
+import {isUndefined} from "../../common/shared.utils";
+import {UnknownRequestMappingException} from "../errors/exceptions/unknown-request-mapping.exception";
 
 export class RoutesResolver implements Resolver {
     private readonly logger = new Logger(RoutesResolver.name, true);
     private readonly routerProxy = new RouterProxy();
-    private readonly routerBuilder: RouterExplorer;
+    private readonly routerBuilder: ExpressRouterExplorer;
 
     constructor(
         private readonly container: NestContainer,
         private readonly expressAdapter,
         private readonly config: ApplicationConfig) {
 
-        // this.routerExceptionsFilter = new RouterExceptionFilters(config);
         this.routerBuilder = new ExpressRouterExplorer(
             new MetadataScanner()
             , this.routerProxy
             , expressAdapter
-            //, this.routerExceptionsFilter
             , config
             , this.container,
         );
@@ -42,7 +43,7 @@ export class RoutesResolver implements Resolver {
         this.logger.log(`setupRouters() ${moduleName}`);
 
         routes.forEach(({ instance, metatype }) => {
-            const path = this.routerBuilder.fetchRouterPath(metatype);  // 메타데이터에서 path 가져오기
+            const path = this.fetchRouterPath(metatype);  // 메타데이터에서 path 가져오기
             const controllerName = metatype.name;
 
             this.logger.log(`setupRouters() ${controllerName} {${path}}:`)
@@ -50,15 +51,17 @@ export class RoutesResolver implements Resolver {
             const router = this.routerBuilder.explore(instance, metatype, moduleName);
             express.use(path, router);
         });
-        // this.setupExceptionHandler(express);
     }
 
-    // public setupExceptionHandler(express: Application) {
-    //     const callback = (err, req, res, next) => {
-    //         throw err;
-    //     };
-    //     const exceptionHandler = this.routerExceptionsFilter.create({}, callback as any);
-    //     const proxy = this.routerProxy.createExceptionLayerProxy(callback, exceptionHandler);
-    //     express.use(proxy);
-    // }
+    public fetchRouterPath(metatype: Metatype<Controller>): string {
+        const path = Reflect.getMetadata(PATH_METADATA, metatype);
+        return this.validateRoutePath(path);
+    }
+
+    public validateRoutePath(path: string): string {
+        if (isUndefined(path)) {
+            throw new UnknownRequestMappingException();
+        }
+        return (path.charAt(0) !== '/') ? '/' + path: path; // 맨 앞에 /가 없으면 붙여주기
+    }
 }

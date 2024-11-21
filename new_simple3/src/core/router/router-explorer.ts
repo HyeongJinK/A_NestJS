@@ -1,6 +1,5 @@
 import 'reflect-metadata';
 import {RouterExplorer} from "./interfaces/explorer.inteface";
-import {RouterMethodFactory} from "../helpers/router-method-factory";
 import {Logger} from "../../common/services/logger.service";
 import {MetadataScanner} from "../metadata-scanner";
 import {RouterProxy, RouterProxyCallback} from "./router-proxy";
@@ -27,7 +26,6 @@ export class ExpressRouterExplorer implements RouterExplorer {
         private readonly metadataScanner?: MetadataScanner,
         private readonly routerProxy?: RouterProxy,
         private readonly expressAdapter?: ExpressAdapter,
-        // private readonly exceptionsFilter?: ExceptionsFilter,
         private readonly config?: ApplicationConfig,
         container?: NestContainer) {
 
@@ -43,10 +41,22 @@ export class ExpressRouterExplorer implements RouterExplorer {
         this.logger.log(`explore() instance: ${instance} metatype: ${metatype} module: ${module}`);
 
         const router = (this.expressAdapter as any).createRouter();
-        this.logger.log(`explore() router: ${router}`);
-        const routerPaths = this.scanForPaths(instance);
-        this.logger.log(`explore() routerPaths[0].methodName: ${routerPaths[0].methodName}`);
         /**
+         *  router: function router(req, res, next) {
+         *     router.handle(req, res, next);
+         *  }
+         * */
+        const instancePrototype = Object.getPrototypeOf(instance);
+        // 아래 함수에서 생성자 및 매개변수를 제외하고 함수만 추출
+        const routerPaths = this.metadataScanner.scanFromPrototype<Controller, RoutePathProperties>(
+            instance,
+            instancePrototype,
+            (method) => this.exploreMethodMetadata(instance, instancePrototype, method),
+        );
+
+        this.logger.log(`explore() json.stringify(routerPaths): ${JSON.stringify(routerPaths)}`);
+        /**
+         * [{"path":"/test","requestMethod":"get","methodName":"test"}]
          [{
              path: this.validateRoutePath(routePath),        // test
              requestMethod,                                  // RequestMethod.GET
@@ -55,8 +65,28 @@ export class ExpressRouterExplorer implements RouterExplorer {
          }];
          */
 
-        this.applyPathsToRouterProxy(router, routerPaths, instance, module);
+        (routerPaths || []).map((pathProperties) => {
+            this.applyCallbackToRouter(router, pathProperties, instance, module);
+        });
         return router;
+    }
+
+    private applyCallbackToRouter(
+        router,
+        pathProperties: RoutePathProperties,
+        instance: Controller,
+        module: string) {
+
+        const { path, requestMethod, targetCallback, methodName } = pathProperties;
+
+        const routerMethod = this.routerMethodFactory.get(router, requestMethod).bind(router);  // 메서드 가져오기
+
+        // const proxy = this.createCallbackProxy(instance, targetCallback, methodName, module, requestMethod);
+        const executionContext = this.executionContextCreator.create(instance, targetCallback, methodName, module, requestMethod);
+        const proxy = this.routerProxy.createProxy(executionContext);
+
+        this.logger.log(`applyCallbackToRouter() proxy: ${proxy}`);
+        routerMethod(path, proxy);
     }
 
     public fetchRouterPath(metatype: Metatype<Controller>): string {
@@ -69,27 +99,6 @@ export class ExpressRouterExplorer implements RouterExplorer {
             throw new UnknownRequestMappingException();
         }
         return validatePath(path);
-    }
-
-    public scanForPaths(instance: Controller, prototype?): RoutePathProperties[] {
-        const instancePrototype = isUndefined(prototype) ? Object.getPrototypeOf(instance) : prototype;
-
-        this.logger.log(`scanForPaths() instance: ${instance} instancePrototype: ${instancePrototype}`);
-
-        // 아래 함수에서 생성자 및 매개변수를 제외하고 함수만 추출
-        return this.metadataScanner.scanFromPrototype<Controller, RoutePathProperties>(
-            instance,
-            instancePrototype,
-            (method) => this.exploreMethodMetadata(instance, instancePrototype, method),
-        );
-        /**
-         [{
-               path: this.validateRoutePath(routePath),        // test
-               requestMethod,                                  // RequestMethod.GET
-               targetCallback,                                 // test(id) { console.log('test') }
-               methodName,                                     // test
-           }];
-         */
     }
 
     public exploreMethodMetadata(instance: Controller, instancePrototype, methodName: string): RoutePathProperties {
@@ -112,42 +121,6 @@ export class ExpressRouterExplorer implements RouterExplorer {
             methodName,                                     // test
         };
     }
-
-    public applyPathsToRouterProxy(
-        router,
-        routePaths: RoutePathProperties[],
-        instance: Controller,
-        module: string) {
-
-        (routePaths || []).map((pathProperties) => {
-            // this.logger.log(`applyPathsToRouterProxy() ${pathProperties.requestMethod} {${pathProperties.path}}`);
-
-            this.applyCallbackToRouter(router, pathProperties, instance, module);
-        });
-    }
-
-    private applyCallbackToRouter(
-        router,
-        pathProperties: RoutePathProperties,
-        instance: Controller,
-        module: string) {
-
-        const { path, requestMethod, targetCallback, methodName } = pathProperties;
-
-        const routerMethod = this.routerMethodFactory.get(router, requestMethod).bind(router);  // 메서드 가져오기
-        const proxy = this.createCallbackProxy(instance, targetCallback, methodName, module, requestMethod);
-        this.logger.log(`applyCallbackToRouter() proxy: ${proxy}`);
-        routerMethod(path, proxy);
-    }
-
-    private createCallbackProxy(instance: Controller, callback: RouterProxyCallback, methodName: string, module: string, requestMethod) {
-        const executionContext = this.executionContextCreator.create(instance, callback, methodName, module, requestMethod);
-        // const exceptionFilter = this.exceptionsFilter.create(instance, callback);
-
-        return this.routerProxy.createProxy(executionContext
-        //    , exceptionFilter
-        );
-    }
 }
 
 export interface RoutePathProperties {
@@ -155,4 +128,21 @@ export interface RoutePathProperties {
     requestMethod: RequestMethod;
     targetCallback: RouterProxyCallback;
     methodName: string;
+}
+
+export class RouterMethodFactory {
+    public get(target, requestMethod: RequestMethod) {
+        switch (requestMethod) {
+            case RequestMethod.POST: return target.post;
+            case RequestMethod.ALL: return target.all;
+            case RequestMethod.DELETE: return target.delete;
+            case RequestMethod.PUT: return target.put;
+            case RequestMethod.PATCH: return target.patch;
+            case RequestMethod.OPTIONS: return target.options;
+            case RequestMethod.HEAD: return target.head;
+            default: {
+                return target.get;
+            }
+        }
+    }
 }
