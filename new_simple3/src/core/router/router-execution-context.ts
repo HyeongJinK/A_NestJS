@@ -1,16 +1,13 @@
 import 'reflect-metadata';
 import {RouteParamtypes} from "../../common/enums/route-paramtypes.enum";
-import {IRouteParamsFactory} from "./interfaces/route-params-factory.interface";
 import {Controller} from "../../common/interfaces/controllers/controller.interface";
 import {RouterResponseController} from "./router-response-controller";
 import {ParamData, RouteParamsMetadata} from "../../decorators/route-params.decorator";
 import {
-    CUSTOM_ROUTE_AGRS_METADATA,
     HTTP_CODE_METADATA,
     PARAMTYPES_METADATA,
     ROUTE_ARGS_METADATA
 } from "../../common/constants";
-import {isFunction, isUndefined} from "../../common/shared.utils";
 import {RequestMethod} from "../../common/enums/request-method.enum";
 import {Logger} from "../../common/services/logger.service";
 
@@ -24,9 +21,7 @@ export interface ParamProperties {
 export class RouterExecutionContext {
     private readonly logger = new Logger('RouterExecutionContext', true);
     private readonly responseController = new RouterResponseController();
-    constructor(
-        private readonly paramsFactory: IRouteParamsFactory
-    ) {}
+    constructor() {}
 
     public create(instance: Controller
                   , callback: (...args) => any
@@ -34,40 +29,39 @@ export class RouterExecutionContext {
                   , module: string
                   , requestMethod: RequestMethod
     ) {
-        this.logger.log(`create() instance: ${instance} 
+        this.logger.log(`create() instance: ${JSON.stringify(instance)}     //  {"asdfg":"test"}
         callback: ${callback} 
         methodName: ${methodName} 
         module: ${module} 
         requestMethod: ${requestMethod}`);
-        const metadata = this.reflectCallbackMetadata(instance, methodName) || {};
+        const metadata =  Reflect.getMetadata(ROUTE_ARGS_METADATA, instance, methodName) || {};     // ROUTE_ARGS_METADATA: __routeArguments__
         const keys = Object.keys(metadata);
-        const argsLength = this.getArgumentsLength(keys, metadata);
-        const paramtypes = this.reflectCallbackParamtypes(instance, methodName);
-        const httpCode = this.reflectHttpStatusCode(callback);
-        const paramsMetadata = this.exchangeKeysForValues(keys, metadata);
-        const isResponseHandled = paramsMetadata.some(({ type }) => type === RouteParamtypes.RESPONSE || type === RouteParamtypes.NEXT);
-        const paramsOptions = this.mergeParamsMetatypes(paramsMetadata, paramtypes);
+        const argsLength = Math.max(...keys.map(key => metadata[key].index)) + 1;
+        const paramtypes = Reflect.getMetadata(PARAMTYPES_METADATA, instance, methodName);  // design:paramtypes
+        this.logger.log_blue(`create() paramtypes: ${paramtypes}`);
+        const httpCode = Reflect.getMetadata(HTTP_CODE_METADATA, callback);
+
+        const paramsOptions = this.exchangeKeysForValues(keys, metadata);
+        this.logger.log_blue(`create() paramsMetadata: ${JSON.stringify(paramsOptions)}`); // [{"index":0,"type":4,"data":"id","pipes":[]}]
+        // some: 하나라도 만족하면 true
+        const isResponseHandled = paramsOptions.some(({ type }) => type === RouteParamtypes.RESPONSE || type === RouteParamtypes.NEXT);
 
         return async (req, res, next) => {
             const args = this.createNullArray(argsLength);
             this.logger.log(`create() paramsOptions: ${paramsOptions} argsLength: ${argsLength}`);
 
+            // 파라미터 추출 및 apply에 전달하기 위해 args에 배열로 저장
             await Promise.all(paramsOptions.map(async (param) => {
-                this.logger.log(`create() param: ${JSON.stringify(param)}`);
-                const { index
-                    , extractValue, type, data, metatype
-                } = param;
+                this.logger.log_cyan(`create() param: ${JSON.stringify(param)}`);
+                const { index, extractValue} = param;
                 const value = extractValue(req, res, next); // case RouteParamtypes.QUERY: return data ? req.query[data] : req.query;
-                this.logger.log(`create() value: ${value} extractValue: ${extractValue}`);
-                args[index] = await this.getParamValue(
-                    value
-                    //, { metatype, type, data }
-                );
+                this.logger.log_cyan(`create() value: ${value} extractValue: ${extractValue}`);
+                args[index] = await this.getParamValue(value);  // value: test or test2.... id 값
             }));
-            this.logger.log(`create() args: ${args}`);
-            const handler = () => callback.apply(instance, args);
-            const result = await handler();
 
+            const result = callback.apply(instance, args);
+
+            this.logger.log_cyan(`create() result: ${result}`);      // "test"
             // Response 처리, HttpStatus 처리
             return !isResponseHandled ?
                 this.responseController.apply(result, res, requestMethod, httpCode) :
@@ -75,33 +69,15 @@ export class RouterExecutionContext {
         };
     }
 
-    public reflectCallbackMetadata(instance: Controller, methodName: string): RouteParamsMetadata {
-        return Reflect.getMetadata(ROUTE_ARGS_METADATA, instance, methodName);
-    }
-
-    public getArgumentsLength(keys: string[], metadata: RouteParamsMetadata): number {
-        return Math.max(...keys.map(key => metadata[key].index)) + 1;
-    }
-
-    public reflectCallbackParamtypes(instance: Controller, methodName: string): any[] {
-        return Reflect.getMetadata(PARAMTYPES_METADATA, instance, methodName);
-    }
-
-    public reflectHttpStatusCode(callback: (...args) => any): number {
-        return Reflect.getMetadata(HTTP_CODE_METADATA, callback);
-    }
-
     public exchangeKeysForValues(keys: string[], metadata: RouteParamsMetadata): ParamProperties[] {
         return keys.map(key => {
             const { index, data, pipes } = metadata[key];
+            this.logger.log_blue(`exchangeKeysForValues() index: ${index} data: ${data} pipes: ${pipes} key: ${key}`);
             const type = this.mapParamType(key);
 
-            if (key.includes(CUSTOM_ROUTE_AGRS_METADATA)) {
-                const { factory } = metadata[key];
-                const customExtractValue = this.getCustomFactory(factory, data);
-                return { index, extractValue: customExtractValue, type, data, pipes };
-            }
-            const extractValue = (req, res, next) => this.paramsFactory.exchangeKeyForValue(type, data, { req, res, next });
+            const extractValue =
+                (req, res, next) => this.exchangeKeyForValue(type, data, { req, res, next });
+
             return { index, extractValue, type, data, pipes };
         });
     }
@@ -111,20 +87,18 @@ export class RouterExecutionContext {
         return Number(keyPair[0]);
     }
 
-    public getCustomFactory(factory: (...args) => void, data): (...args) => any {
-      return !isUndefined(factory) && isFunction(factory)
-        ? (req, res, next) => factory(data, req)
-        : () => null;
-    }
-
-    public mergeParamsMetatypes(
-      paramsProperties: ParamProperties[],
-      paramtypes: any[],
-    ): (ParamProperties & { metatype?: any })[] {
-      if (!paramtypes) {
-        return paramsProperties;
-      }
-      return paramsProperties.map((param) => ({ ...param, metatype: paramtypes[param.index] }));
+    public exchangeKeyForValue(key: RouteParamtypes, data, { req, res, next }) {
+        switch (key) {
+            case RouteParamtypes.NEXT: return next;
+            case RouteParamtypes.REQUEST: return req;
+            case RouteParamtypes.RESPONSE: return res;
+            case RouteParamtypes.BODY: return data && req.body ? req.body[data] : req.body;
+            case RouteParamtypes.PARAM: return data ? req.params[data] : req.params;
+            case RouteParamtypes.QUERY: return data ? req.query[data] : req.query;
+            case RouteParamtypes.HEADERS: return data ? req.headers[data] : req.headers;
+            case RouteParamtypes.SESSION: return req.session;
+            default: return null;
+        }
     }
 
     public createNullArray(length: number): any[] {

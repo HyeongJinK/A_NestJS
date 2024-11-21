@@ -1,5 +1,4 @@
 import 'reflect-metadata';
-// import {InvalidModuleConfigException} from "./exceptions/invalid-module-config.exception";
 import {metadata} from "../common/constants";
 import {Logger} from "../common/services/logger.service";
 
@@ -17,7 +16,6 @@ const validateKeys = (keys: string[]) => {
     const isKeyValid = (key: any) => metadataKeys.findIndex(k => k === key) < 0;
     const validateKey = (key: any) => {
         if (isKeyValid(key)) {
-            // throw new InvalidModuleConfigException(key);
             throw new Error(`Invalid property '${key}' in @Module() decorator.`);
         }
     };

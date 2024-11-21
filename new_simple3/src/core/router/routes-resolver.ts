@@ -32,7 +32,9 @@ export class RoutesResolver implements Resolver {
     }
 
     public resolve(express: Application) {
+        // 모델을 가져옴
         const modules = this.container.getModules();
+        // 가져온 모듈에서 routes(Controller)를 가져와서 setupRouters() 호출
         modules.forEach(({ routes }, moduleName) => this.setupRouters(routes, moduleName, express));
     }
 
@@ -42,13 +44,16 @@ export class RoutesResolver implements Resolver {
         express: Application) {
         this.logger.log(`setupRouters() ${moduleName}`);
 
+        // routes(Controller) 반복문
+        // 인스턴스와 메타타입, 인스턴스의 경우 함수를 실행하기 위해서 필요
         routes.forEach(({ instance, metatype }) => {
+            // 메타데이터에서 path 가져오기
             const path = this.fetchRouterPath(metatype);  // 메타데이터에서 path 가져오기
-            const controllerName = metatype.name;
+            this.logger.log(`setupRouters() ${metatype.name} {${path}}:`)
 
-            this.logger.log(`setupRouters() ${controllerName} {${path}}:`)
-
+            // 라우터 생성
             const router = this.routerBuilder.explore(instance, metatype, moduleName);
+            // express에 라우터 등록
             express.use(path, router);
         });
     }

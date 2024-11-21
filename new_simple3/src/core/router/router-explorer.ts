@@ -1,5 +1,4 @@
 import 'reflect-metadata';
-import {RouterExplorer} from "./interfaces/explorer.inteface";
 import {Logger} from "../../common/services/logger.service";
 import {MetadataScanner} from "../metadata-scanner";
 import {RouterProxy, RouterProxyCallback} from "./router-proxy";
@@ -7,7 +6,6 @@ import {ExpressAdapter} from "../adapters/express-adapter";
 import {ApplicationConfig} from "../application-config";
 import {NestContainer} from "../injector/container";
 import {RouterExecutionContext} from "./router-execution-context";
-import {RouteParamsFactory} from "./route-params-factory";
 import {RequestMethod} from "../../common/enums/request-method.enum";
 import {Controller} from "../../common/interfaces/controllers/controller.interface";
 import {Metatype} from "../../common/interfaces/metatype.interface";
@@ -15,10 +13,10 @@ import {METHOD_METADATA, PATH_METADATA} from "../../common/constants";
 import {isUndefined, validatePath} from "../../common/shared.utils";
 import {UnknownRequestMappingException} from "../errors/exceptions/unknown-request-mapping.exception";
 
-export class ExpressRouterExplorer implements RouterExplorer {
+export class ExpressRouterExplorer {
     private readonly executionContextCreator: RouterExecutionContext;
     private readonly routerMethodFactory = new RouterMethodFactory();
-    private readonly logger = new Logger('RouterExplorer', true);
+    private readonly logger = new Logger('ExpressRouterExplorer', true);
 
     constructor(
         private readonly metadataScanner?: MetadataScanner,
@@ -27,21 +25,20 @@ export class ExpressRouterExplorer implements RouterExplorer {
         private readonly config?: ApplicationConfig,
         container?: NestContainer) {
 
-        this.executionContextCreator = new RouterExecutionContext(
-            new RouteParamsFactory(),
-        );
+        this.executionContextCreator = new RouterExecutionContext();
     }
 
     public explore(instance: Controller, metatype: Metatype<Controller>, module: string) {
         this.logger.log(`explore() instance: ${instance} metatype: ${metatype} module: ${module}`);
-
-        const router = (this.expressAdapter as any).createRouter();
         /**
-         *  router: function router(req, res, next) {
+         * 라우터 생성
+         * router: function router(req, res, next) {
          *     router.handle(req, res, next);
          *  }
          * */
-        const instancePrototype = Object.getPrototypeOf(instance);
+        const router = (this.expressAdapter as any).createRouter();
+        const instancePrototype = Object.getPrototypeOf(instance);      // 컨트롤러의 프로토 타입
+
         // 아래 함수에서 생성자 및 매개변수를 제외하고 함수만 추출
         const routerPaths = this.metadataScanner.scanFromPrototype<Controller, RoutePathProperties>(
             instance,
@@ -84,11 +81,6 @@ export class ExpressRouterExplorer implements RouterExplorer {
         routerMethod(path, proxy);
     }
 
-    public fetchRouterPath(metatype: Metatype<Controller>): string {
-        const path = Reflect.getMetadata(PATH_METADATA, metatype);
-        return this.validateRoutePath(path);
-    }
-
     public validateRoutePath(path: string): string {
         if (isUndefined(path)) {
             throw new UnknownRequestMappingException();
@@ -97,6 +89,7 @@ export class ExpressRouterExplorer implements RouterExplorer {
     }
 
     public exploreMethodMetadata(instance: Controller, instancePrototype, methodName: string): RoutePathProperties {
+        // 함수 추출
         const targetCallback = instancePrototype[methodName];
         const routePath = Reflect.getMetadata(PATH_METADATA, targetCallback);
 

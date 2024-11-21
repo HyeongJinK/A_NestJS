@@ -21,6 +21,14 @@ export class Logger {
         this.printMessage(message, clc.green);
     }
 
+    public log_cyan(message: string) {
+        this.printMessage(message, clc.cyan);
+    }
+
+    public log_blue(message: string) {
+        this.printMessage(message, clc.blue);
+    }
+
     public error(message: string, trace = '') {
         this.printMessage(message, clc.red);
         this.printStackTrace(trace);
