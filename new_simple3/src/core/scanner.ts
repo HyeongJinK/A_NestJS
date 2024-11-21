@@ -33,7 +33,7 @@ export class DependenciesScanner {
 
     public storeModule(module: any, scope: NestModuleMetatype[]) {
         this.logger.log(`storeModule() module: ${module}`);
-        if (module && module.forwardRef) {
+        if (module && module.forwardRef) {  // 순환 종속성 https://docs.nestjs.com/fundamentals/circular-dependency#moduleref-class-alternative
             this.logger.log(`storeModule() module.forwardRef: ${module.forwardRef()}`);
             return this.container.addModule(module.forwardRef(), scope);
         }
