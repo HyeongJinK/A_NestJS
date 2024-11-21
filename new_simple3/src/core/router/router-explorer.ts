@@ -14,8 +14,6 @@ import {Metatype} from "../../common/interfaces/metatype.interface";
 import {METHOD_METADATA, PATH_METADATA} from "../../common/constants";
 import {isUndefined, validatePath} from "../../common/shared.utils";
 import {UnknownRequestMappingException} from "../errors/exceptions/unknown-request-mapping.exception";
-import {InterceptorsConsumer} from "../interceptors/interceptors-consumer";
-import {InterceptorsContextCreator} from "../interceptors/interceptors-context-creator";
 
 export class ExpressRouterExplorer implements RouterExplorer {
     private readonly executionContextCreator: RouterExecutionContext;
@@ -31,9 +29,6 @@ export class ExpressRouterExplorer implements RouterExplorer {
 
         this.executionContextCreator = new RouterExecutionContext(
             new RouteParamsFactory(),
-            // 인터셉터
-            new InterceptorsContextCreator(container, config),
-            new InterceptorsConsumer(),
         );
     }
 

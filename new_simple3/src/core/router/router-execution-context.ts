@@ -11,8 +11,6 @@ import {
     ROUTE_ARGS_METADATA
 } from "../../common/constants";
 import {isFunction, isUndefined} from "../../common/shared.utils";
-import {InterceptorsConsumer} from "../interceptors/interceptors-consumer";
-import {InterceptorsContextCreator} from "../interceptors/interceptors-context-creator";
 import {RequestMethod} from "../../common/enums/request-method.enum";
 import {Logger} from "../../common/services/logger.service";
 
@@ -27,9 +25,7 @@ export class RouterExecutionContext {
     private readonly logger = new Logger('RouterExecutionContext', true);
     private readonly responseController = new RouterResponseController();
     constructor(
-        private readonly paramsFactory: IRouteParamsFactory,
-        private readonly interceptorsContextCreator: InterceptorsContextCreator,
-        private readonly interceptorsConsumer: InterceptorsConsumer
+        private readonly paramsFactory: IRouteParamsFactory
     ) {}
 
     public create(instance: Controller
@@ -47,7 +43,6 @@ export class RouterExecutionContext {
         const keys = Object.keys(metadata);
         const argsLength = this.getArgumentsLength(keys, metadata);
         const paramtypes = this.reflectCallbackParamtypes(instance, methodName);
-        const interceptors = this.interceptorsContextCreator.create(instance, callback, module);
         const httpCode = this.reflectHttpStatusCode(callback);
         const paramsMetadata = this.exchangeKeysForValues(keys, metadata);
         const isResponseHandled = paramsMetadata.some(({ type }) => type === RouteParamtypes.RESPONSE || type === RouteParamtypes.NEXT);
@@ -71,9 +66,9 @@ export class RouterExecutionContext {
             }));
             this.logger.log(`create() args: ${args}`);
             const handler = () => callback.apply(instance, args);
-            const result = await this.interceptorsConsumer.intercept(
-                interceptors, req, instance, callback, handler,
-            );
+            const result = await handler();
+
+            // Response 처리, HttpStatus 처리
             return !isResponseHandled ?
                 this.responseController.apply(result, res, requestMethod, httpCode) :
                 undefined;
