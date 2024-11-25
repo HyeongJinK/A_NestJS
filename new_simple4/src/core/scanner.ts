@@ -22,22 +22,13 @@ export class DependenciesScanner {
 
     public scanForModules(module: NestModuleMetatype, scope: NestModuleMetatype[] = []) {
         this.logger.log(`scanForModules() module: ${module}`);
-        this.storeModule(module, scope);
+        this.container.addModule(module, scope);
 
         const importedModules = this.reflectMetadata(module, metadata.MODULES); // metadata.MODULES = 'modules'
         this.logger.log(`scanForModules() importedModules: ${importedModules}`);
         importedModules.map((innerModule: any) => {
             this.scanForModules(innerModule, [...scope, module]);
         });
-    }
-
-    public storeModule(module: any, scope: NestModuleMetatype[]) {
-        this.logger.log(`storeModule() module: ${module}`);
-        if (module && module.forwardRef) {  // 순환 종속성 https://docs.nestjs.com/fundamentals/circular-dependency#moduleref-class-alternative
-            this.logger.log(`storeModule() module.forwardRef: ${module.forwardRef()}`);
-            return this.container.addModule(module.forwardRef(), scope);
-        }
-        this.container.addModule(module, scope);
     }
 
     public reflectMetadata(metatype: any, metadata: string) {
