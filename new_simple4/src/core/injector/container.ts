@@ -3,7 +3,6 @@ import {Metatype} from "../../common/interfaces/metatype.interface";
 import {NestModuleMetatype} from "../../common/interfaces/modules/module-metatype.interface";
 import {InvalidModuleException} from "../errors/exceptions/invalid-module.exception";
 import {Module} from "./module";
-import {ModuleTokenFactory} from "./module-token-factory";
 import {Logger} from "../../common/services/logger.service";
 import {UnknownModuleException} from "../errors/exceptions/unknown-module.exception";
 import {Controller} from "../../common/interfaces/controllers/controller.interface";
@@ -11,36 +10,28 @@ import {Controller} from "../../common/interfaces/controllers/controller.interfa
 export class NestContainer {
     private logger = new Logger('NestContainer', true);
     private readonly modules = new Map<string, Module>();
-    private readonly moduleTokenFactory = new ModuleTokenFactory();
 
     public addModule(metatype: NestModuleMetatype, scope: NestModuleMetatype[]) {
         if (!metatype) {
             throw new InvalidModuleException(scope);
         }
-        const token = this.moduleTokenFactory.create(metatype, scope);
+        // 토큰 생성
+        const opaqueToken = {
+            module: metatype.name,
+            scope: 'global',
+        };
+        const token = JSON.stringify(opaqueToken);
         this.logger.log(`addModule() token: ${token}`); // addModule() token: {"module":"ApplicationModule","scope":"global"}
-        if (this.modules.has(token)) {
+
+        if (this.modules.has(token)) { // 해당 토큰을 키값으로 하는 모듈이 존재하는 지 검사
             return;
         }
+        // 모듈 추가
         this.modules.set(token, new Module(metatype, scope));
     }
 
     public getModules(): Map<string, Module> {
         return this.modules;
-    }
-
-    public addRelatedModule(relatedModule: NestModuleMetatype, token: string) {
-        if (!this.modules.has(token)) return;
-
-        const module: Module = <Module>this.modules.get(token);
-        const parent = module.metatype;
-
-        const relatedModuleToken = this.moduleTokenFactory.create(
-            relatedModule,
-            [...module.scope, parent],
-        );
-        const related: Module = <Module>this.modules.get(relatedModuleToken);
-        module.addRelatedModule(related);
     }
 
     public addController(controller: Metatype<Controller>, token: string) {

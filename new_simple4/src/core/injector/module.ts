@@ -77,14 +77,6 @@ export class Module {
         return this._metatype;
     }
 
-    get scope(): NestModuleMetatype[] {
-        return this._scope;
-    }
-
-    public addRelatedModule(relatedModule: any) {
-        this._relatedModules.add(relatedModule);
-    }
-
     public addRoute(route: Metatype<Controller>) {
         this.logger.log(`addRoute() route: ${route}`);
         this._routes.set(route.name, {

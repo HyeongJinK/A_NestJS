@@ -13,14 +13,12 @@ export class InstanceLoader {
     public async createInstancesOfDependencies() {
         const modules = this.container.getModules();    // 모듈 가져오기
 
-        this.createPrototypes(modules);
-        await this.createInstances(modules);
-    }
-
-    private createPrototypes(modules: Map<string, Module>) {
+        // this.createPrototypes(modules);
         modules.forEach((module) => {
             this.createPrototypesOfRoutes(module);
         });
+
+        await this.createInstances(modules);
     }
 
     private createPrototypesOfRoutes(module: Module) {
@@ -39,7 +37,8 @@ export class InstanceLoader {
     }
 
     private async createInstancesOfRoutes(module: Module) {
-        await Promise.all([...module.routes.values()].map(async (wrapper) =>
+        await Promise.all([...module.routes.values()]
+                .map(async (wrapper) =>
             await this.injector.loadInstanceOfRoute(wrapper, module),
         ));
     }
