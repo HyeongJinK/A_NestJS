@@ -3,7 +3,6 @@ import {TestController} from "./test.controller";
 
 @Module({
     controllers: [TestController],
-    components: [],
 })
 export class ApplicationModule {
 }

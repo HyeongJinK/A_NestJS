@@ -18,7 +18,7 @@ export class InstanceLoader {
             this.createPrototypesOfRoutes(module);
         });
 
-        await this.createInstances(modules);
+        // await this.createInstances(modules);
     }
 
     private createPrototypesOfRoutes(module: Module) {
@@ -26,20 +26,5 @@ export class InstanceLoader {
         module.routes.forEach((wrapper) => {
             this.injector.loadPrototypeOfInstance<Controller>(wrapper, module.routes);
         });
-    }
-
-    private async createInstances(modules: Map<string, Module>) {
-        for (const module of [...modules.values()]) {
-            await this.createInstancesOfRoutes(module);
-
-            this.logger.log(`${module.metatype.name} dependencies initialized`);
-        }
-    }
-
-    private async createInstancesOfRoutes(module: Module) {
-        await Promise.all([...module.routes.values()]
-                .map(async (wrapper) =>
-            await this.injector.loadInstanceOfRoute(wrapper, module),
-        ));
     }
 }

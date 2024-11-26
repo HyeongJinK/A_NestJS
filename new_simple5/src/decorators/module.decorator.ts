@@ -4,8 +4,6 @@ import {Logger} from "../common/services/logger.service";
 
 const metadataKeys = [
     metadata.MODULES,
-    metadata.EXPORTS,
-    metadata.COMPONENTS,
     metadata.CONTROLLERS,
 ];
 
@@ -28,8 +26,6 @@ const validateKeys = (keys: string[]) => {
 export function Module(obj: {
     modules?: any[],
     controllers?: any[],
-    components?: any[],
-    exports?: any[],
 }): ClassDecorator {
     const logger = new Logger('Module Decorator', true);
     logger.log(`Module decorator is called Start`);
