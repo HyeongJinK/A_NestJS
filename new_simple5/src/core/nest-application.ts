@@ -1,6 +1,5 @@
 import * as http from 'http';
 import * as bodyParser from 'body-parser';
-import {INestApplication} from "../common/interfaces/nest-application.interface";
 import {Logger} from "../common/services/logger.service";
 import {NestContainer} from "./injector/container";
 import {ApplicationConfig} from "./application-config";
@@ -9,7 +8,7 @@ import {RoutesResolver} from "./router/routes-resolver";
 import {validatePath} from "../common/shared.utils";
 
 
-export class NestApplication implements INestApplication {
+export class NestApplication {
     private readonly logger = new Logger(NestApplication.name, true);
     private readonly config: ApplicationConfig;
     private readonly routesResolver: RoutesResolver = null;
@@ -25,7 +24,7 @@ export class NestApplication implements INestApplication {
         this.config = new ApplicationConfig();
 
         this.routesResolver = new RoutesResolver(
-            container, ExpressAdapter, this.config,
+            container, ExpressAdapter
         );
     }
 
@@ -51,6 +50,7 @@ export class NestApplication implements INestApplication {
     }
 
     public async setupRouter() {
+        // Express에 라우터를 생성
         const router = ExpressAdapter.createRouter();
 
         this.routesResolver.resolve(router);

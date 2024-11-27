@@ -22,7 +22,6 @@ export class ExpressRouterExplorer {
         private readonly metadataScanner?: MetadataScanner,
         private readonly routerProxy?: RouterProxy,
         private readonly expressAdapter?: ExpressAdapter,
-        private readonly config?: ApplicationConfig,
         container?: NestContainer) {
 
         this.executionContextCreator = new RouterExecutionContext();
@@ -30,18 +29,13 @@ export class ExpressRouterExplorer {
 
     public explore(instance: Controller, metatype: Metatype<Controller>, module: string) {
         this.logger.log(`explore() instance: ${instance} metatype: ${metatype} module: ${module}`);
-        /**
-         * 라우터 생성
-         * router: function router(req, res, next) {
-         *     router.handle(req, res, next);
-         *  }
-         * */
+
+         // express 새로 라우터 생성
         const router = (this.expressAdapter as any).createRouter();
         const instancePrototype = Object.getPrototypeOf(instance);      // 컨트롤러의 프로토 타입
 
         // 아래 함수에서 생성자 및 매개변수를 제외하고 함수만 추출
         const routerPaths = this.metadataScanner.scanFromPrototype<Controller, RoutePathProperties>(
-            instance,
             instancePrototype,
             (method) => this.exploreMethodMetadata(instance, instancePrototype, method),
         );

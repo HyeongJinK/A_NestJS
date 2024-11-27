@@ -5,7 +5,6 @@ import {NestContainer} from "./injector/container";
 import {messages} from "./constants";
 import {ExpressAdapter} from "./adapters/express-adapter";
 import {InstanceLoader} from "./injector/instance-loader";
-import {INestApplication} from "../common/interfaces/nest-application.interface";
 import {NestApplication} from "./nest-application";
 import {isFunction} from "../common/shared.utils";
 
@@ -17,7 +16,7 @@ export class NestFactoryStatic {
 
     /**
      */
-    public async create(module: any, express = ExpressAdapter.create()): Promise<INestApplication> {
+    public async create(module: any, express = ExpressAdapter.create()): Promise<NestApplication> {
         this.logger.log(`create() parameter module: ${module}`);
         await this.initialize(module);
         return this.createNestInstance<NestApplication>(

@@ -5,7 +5,7 @@ import {Logger} from "../common/services/logger.service";
 
 export class MetadataScanner {
     private readonly logger = new Logger('MetadataScanner', true);
-    public scanFromPrototype<T extends Injectable, R>(instance: T, prototype: any, callback: (name: string) => R): R[] {
+    public scanFromPrototype<T extends Injectable, R>(prototype: any, callback: (name: string) => R): R[] {
         return iterate(Object.getOwnPropertyNames(prototype))
             .filter((method) => {
                 this.logger.log(`scanFromPrototype() method: ${method}`);
