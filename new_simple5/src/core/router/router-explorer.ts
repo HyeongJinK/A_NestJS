@@ -3,7 +3,6 @@ import {Logger} from "../../common/services/logger.service";
 import {MetadataScanner} from "../metadata-scanner";
 import {RouterProxy, RouterProxyCallback} from "./router-proxy";
 import {ExpressAdapter} from "../adapters/express-adapter";
-import {ApplicationConfig} from "../application-config";
 import {NestContainer} from "../injector/container";
 import {RouterExecutionContext} from "./router-execution-context";
 import {RequestMethod} from "../../common/enums/request-method.enum";
