@@ -84,7 +84,7 @@ export class ExpressRouterExplorer {
     public exploreMethodMetadata(instance: Controller, instancePrototype, methodName: string): RoutePathProperties {
         // 함수 추출
         const targetCallback = instancePrototype[methodName];
-        const routePath = Reflect.getMetadata(PATH_METADATA, targetCallback);
+        const routePath = Reflect.getMetadata(PATH_METADATA, targetCallback);   // path
 
         this.logger.log(`exploreMethodMetadata() instance: ${instance} instancePrototype: ${instancePrototype} methodName: ${methodName}
         targetCallback: ${targetCallback} 
@@ -93,7 +93,7 @@ export class ExpressRouterExplorer {
             return null;
         }
 
-        const requestMethod: RequestMethod = Reflect.getMetadata(METHOD_METADATA, targetCallback);
+        const requestMethod: RequestMethod = Reflect.getMetadata(METHOD_METADATA, targetCallback);  // method
         this.logger.log(`exploreMethodMetadata() requestMethod: ${requestMethod}`);
         return {
             path: this.validateRoutePath(routePath),        // test
