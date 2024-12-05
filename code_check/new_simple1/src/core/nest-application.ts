@@ -11,8 +11,8 @@ import {validatePath} from "../common/shared.utils";
 
 // import iterate from 'iterare';
 // import * as optional from 'optional';
-// import {MiddlewaresModule} from "./middlewares/middlewares/middlewares-module";
-// import {MiddlewaresContainer} from "./middlewares/middlewares/container";
+// import {MiddlewaresModule} from "./middlewares/middlewares-module";
+// import {MiddlewaresContainer} from "./middlewares/container";
 // import {ApplicationConfig} from "./application-config";
 // import {NestContainer} from "./injector/container";
 // import {ExpressAdapter} from "./adapters/express-adapter";

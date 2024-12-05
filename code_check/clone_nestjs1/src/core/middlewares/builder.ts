@@ -9,18 +9,18 @@
 // import { NestMiddleware } from '@nestjs/common';
 // import { filterMiddlewares } from './utils';
 
-import {MiddlewaresConsumer} from "../../../common/interfaces/middlewares/middlewares-consumer.interface";
-import {MiddlewareConfiguration} from "../../../common/interfaces/middlewares/middleware-configuration.interface";
+import {MiddlewareConfiguration} from "../../common/interfaces/middlewares/middleware-configuration.interface";
 import {RoutesMapper} from "./routes-mapper";
-import {Logger} from "../../../common/services/logger.service";
-import {MiddlewareConfigProxy} from "../../../common/interfaces/middlewares/middleware-config-proxy.interface";
-import {isNil, isUndefined} from "../../../common/utils/shared.utils";
+import {Logger} from "../../common/services/logger.service";
+import {MiddlewareConfigProxy} from "../../common/interfaces/middlewares/middleware-config-proxy.interface";
+import {isNil, isUndefined} from "../../common/utils/shared.utils";
 import {
     InvalidMiddlewareConfigurationException
-} from "../../errors/exceptions/invalid-middleware-configuration.exception";
-import {Metatype} from "../../../common/interfaces/metatype.interface";
+} from "../errors/exceptions/invalid-middleware-configuration.exception";
+import {Metatype} from "../../common/interfaces/metatype.interface";
 import {filterMiddlewares} from "./utils";
-import {BindResolveMiddlewareValues} from "../../../common/utils/bind-resolve-values.util";
+import {BindResolveMiddlewareValues} from "../../common/utils/bind-resolve-values.util";
+import {MiddlewaresConsumer} from "../../common/interfaces/middlewares/middlewares-consumer.interface";
 
 export class MiddlewareBuilder implements MiddlewaresConsumer {
     private readonly middlewaresCollection = new Set<MiddlewareConfiguration>();

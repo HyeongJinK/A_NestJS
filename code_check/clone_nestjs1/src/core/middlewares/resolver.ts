@@ -2,9 +2,9 @@
 // import { Injector } from '../injector/injector';
 // import { Module } from '../injector/module';
 
-import {Injector} from "../../injector/injector";
+import {Injector} from "../injector/injector";
 import {MiddlewaresContainer, MiddlewareWrapper} from "./container";
-import {Module} from "../../injector/module";
+import {Module} from "../injector/module";
 
 export class MiddlewaresResolver {
     private readonly instanceLoader = new Injector();

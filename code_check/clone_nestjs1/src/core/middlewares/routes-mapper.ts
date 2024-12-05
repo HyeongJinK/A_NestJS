@@ -1,10 +1,10 @@
 import 'reflect-metadata';
-import {ExpressRouterExplorer} from "../../router/router-explorer";
-import {MetadataScanner} from "../../metadata-scanner";
-import {isUndefined, validatePath} from "../../../common/utils/shared.utils";
-import {UnknownRequestMappingException} from "../../errors/exceptions/unknown-request-mapping.exception";
-import {RequestMethod} from "../../../common/enums";
-import {PATH_METADATA} from "../../../common/constants";
+import {ExpressRouterExplorer} from "../router/router-explorer";
+import {MetadataScanner} from "../metadata-scanner";
+import {isUndefined, validatePath} from "../../common/utils/shared.utils";
+import {UnknownRequestMappingException} from "../errors/exceptions/unknown-request-mapping.exception";
+import {RequestMethod} from "../../common/enums";
+import {PATH_METADATA} from "../../common/constants";
 // import { ExpressRouterExplorer } from '../router/router-explorer';
 // import { UnknownRequestMappingException } from '../errors/exceptions/unknown-request-mapping.exception';
 // import { RequestMethod } from '@nestjs/common/enums/request-method.enum';

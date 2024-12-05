@@ -1,11 +1,18 @@
 import 'reflect-metadata';
 import iterate from 'iterare';
-import { Controller, NestInterceptor } from '@nestjs/common/interfaces';
-import { INTERCEPTORS_METADATA } from '@nestjs/common/constants';
-import { isUndefined, isFunction, isNil, isEmpty } from '@nestjs/common/utils/shared.utils';
-import { ContextCreator } from './../helpers/context-creator';
-import { NestContainer } from '../injector/container';
-import { ConfigurationProvider } from '@nestjs/common/interfaces/configuration-provider.interface';
+import {ContextCreator} from "../helpers/context-creator";
+import {NestContainer} from "../injector/container";
+import {ConfigurationProvider} from "../../common/interfaces/configuration-provider.interface";
+import {Controller} from "../../common/interfaces/controllers/controller.interface";
+import {NestInterceptor} from "../../common/interfaces/nest-interceptor.interface";
+import {INTERCEPTORS_METADATA} from "../../common/constants";
+import {isEmpty, isFunction, isUndefined} from "../../common/utils/shared.utils";
+// import { Controller, NestInterceptor } from '@nestjs/common/interfaces';
+// import { INTERCEPTORS_METADATA } from '@nestjs/common/constants';
+// import { isUndefined, isFunction, isNil, isEmpty } from '@nestjs/common/utils/shared.utils';
+// import { ContextCreator } from './../helpers/context-creator';
+// import { NestContainer } from '../injector/container';
+// import { ConfigurationProvider } from '@nestjs/common/interfaces/configuration-provider.interface';
 
 export class InterceptorsContextCreator extends ContextCreator {
     private moduleContext: string;

@@ -1,8 +1,10 @@
 // import { isFunction } from '@nestjs/common/utils/shared.utils';
 // import { Metatype } from '@nestjs/common/interfaces';
 
-import {Metatype} from "../../../common/interfaces/metatype.interface";
-import {isFunction} from "../../../common/utils/shared.utils";
+import {Metatype} from "../../common/interfaces/metatype.interface";
+import {isFunction} from "../../common/utils/shared.utils";
+
+let id = 1;
 
 export const filterMiddlewares = (middlewares) => {
     return [].concat(middlewares)
@@ -11,7 +13,7 @@ export const filterMiddlewares = (middlewares) => {
 };
 
 export const mapToClass = (middleware) => {
-    if (this.isClass(middleware)) {
+    if (isClass(middleware)) {
         return middleware;
     }
     return assignToken(class {
@@ -24,7 +26,7 @@ export const isClass = (middleware) => {
 };
 
 export const assignToken = (metatype): Metatype<any> => {
-    this.id = this.id || 1;
-    Object.defineProperty(metatype, 'name', { value: ++this.id });
+    id = id || 1;
+    Object.defineProperty(metatype, 'name', { value: ++id });
     return metatype;
 };

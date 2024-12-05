@@ -20,25 +20,25 @@
 // import { RouterExceptionFilters } from './../router/router-exception-filters';
 
 import {RoutesMapper} from "./routes-mapper";
-import {RouterProxy} from "../../router/router-proxy";
-import {RouterMethodFactory} from "../../helpers/router-method-factory";
-import {RouterExceptionFilters} from "../../router/router-exception-filters";
+import {RouterProxy} from "../router/router-proxy";
+import {RouterMethodFactory} from "../helpers/router-method-factory";
+import {RouterExceptionFilters} from "../router/router-exception-filters";
 import {MiddlewaresResolver} from "./resolver";
 import {MiddlewaresContainer, MiddlewareWrapper} from "./container";
-import {NestContainer} from "../../injector/container";
-import {ApplicationConfig} from "../../application-config";
-import {Module} from "../../injector/module";
-import {NestModule} from "../../../common/interfaces/modules/nest-module.interface";
+import {NestContainer} from "../injector/container";
+import {ApplicationConfig} from "../application-config";
+import {Module} from "../injector/module";
+import {NestModule} from "../../common/interfaces/modules/nest-module.interface";
 import {MiddlewareBuilder} from "./builder";
-import {MiddlewareConfiguration} from "../../../common/interfaces/middlewares/middleware-configuration.interface";
-import {ControllerMetadata} from "../../../common/interfaces/controllers/controller-metadata.interface";
-import {RequestMethod} from "../../../common/enums";
-import {Metatype} from "../../../common/interfaces/metatype.interface";
-import {RuntimeException} from "../../errors/exceptions/runtime.exception";
-import {isUndefined} from "../../../common/utils/shared.utils";
-import {InvalidMiddlewareException} from "../../errors/exceptions/invalid-middleware.exception";
-import {NestMiddleware} from "../../../common/interfaces/middlewares/nest-middleware.interface";
-import {ExceptionsHandler} from "../../exceptions/exceptions-handler";
+import {MiddlewareConfiguration} from "../../common/interfaces/middlewares/middleware-configuration.interface";
+import {ControllerMetadata} from "../../common/interfaces/controllers/controller-metadata.interface";
+import {RequestMethod} from "../../common/enums";
+import {Metatype} from "../../common/interfaces/metatype.interface";
+import {RuntimeException} from "../errors/exceptions/runtime.exception";
+import {isUndefined} from "../../common/utils/shared.utils";
+import {InvalidMiddlewareException} from "../errors/exceptions/invalid-middleware.exception";
+import {NestMiddleware} from "../../common/interfaces/middlewares/nest-middleware.interface";
+import {ExceptionsHandler} from "../exceptions/exceptions-handler";
 
 export class MiddlewaresModule {
     private readonly routesMapper = new RoutesMapper();
@@ -103,9 +103,9 @@ export class MiddlewaresModule {
         app,
     ) {
         const { forRoutes } = config;
-        await Promise.all(forRoutes.map(async (route: ControllerMetadata & { method: RequestMethod }) => {
-            await this.setupRouteMiddleware(middlewaresContainer, route, config, module, app);
-        }));
+        // await Promise.all(forRoutes.map(async (route: ControllerMetadata & { method: RequestMethod }) => {
+        //     await this.setupRouteMiddleware(middlewaresContainer, route, config, module, app);
+        // }));
     }
 
     public async setupRouteMiddleware(

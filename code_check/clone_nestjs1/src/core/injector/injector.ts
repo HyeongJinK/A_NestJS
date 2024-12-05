@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import {MiddlewareWrapper} from "../middlewares/middlewares/container";
+import {MiddlewareWrapper} from "../middlewares/container";
 import {InstanceWrapper} from "./container";
 import {Module} from "./module";
 import {RuntimeException} from "../errors/exceptions/runtime.exception";

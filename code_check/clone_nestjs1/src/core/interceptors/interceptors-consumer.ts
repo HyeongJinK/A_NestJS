@@ -2,14 +2,15 @@ import iterate from 'iterare';
 import {Controller} from "../../common/interfaces/controllers/controller.interface";
 import {NestInterceptor} from "../../common/interfaces/nest-interceptor.interface";
 import {isEmpty} from "../../common/utils/shared.utils";
-import {Observable} from "rxjs";
+import {defer, from as fromPromise, Observable} from "rxjs";
+import {ExecutionContext} from "../../common/interfaces/execution-context.interface";
 // import { GUARDS_METADATA } from '@nestjs/common/constants';
 // import { isUndefined, isFunction, isNil, isEmpty } from '@nestjs/common/utils/shared.utils';
 // import { Controller } from '@nestjs/common/interfaces';
 // import { HttpStatus, ExecutionContext, NestInterceptor } from '@nestjs/common';
-// import { Observable } from 'rxjs/Observable';
+//import { Observable } from 'rxjs/Observable';
 // import 'rxjs/add/operator/toPromise';
-// import 'rxjs/add/observable/defer';
+//import 'rxjs/add/observable/defer';
 // import 'rxjs/add/operator/take';
 
 export class InterceptorsConsumer {
@@ -24,7 +25,7 @@ export class InterceptorsConsumer {
             return await next();
         }
         const context = this.createContext(instance, callback);
-        const start$ = Observable.defer(() => this.transformDeffered(next));
+        const start$ = defer(() => this.transformDeffered(next));
         const result$ = await interceptors.reduce(
           async (stream$, interceptor) => await interceptor.intercept(dataOrRequest, context, await stream$),
           Promise.resolve(start$),

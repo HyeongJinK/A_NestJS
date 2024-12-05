@@ -117,7 +117,7 @@ export class RouterExecutionContext {
     }
 
     public createNullArray(length: number): any[] {
-        return Array.apply(null, { length }).fill(null);
+        return Array(length).fill(null);
     }
 
     public exchangeKeysForValues(keys: string[], metadata: RouteParamsMetadata): ParamProperties[] {

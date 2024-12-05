@@ -8,7 +8,7 @@ export class ExceptionsZone {
         try {
             fn();
         }
-        catch (e) {
+        catch (e : any) {
             this.exceptionHandler.handle(e);
             throw UNHANDLED_RUNTIME_EXCEPTION;
         }
@@ -18,7 +18,7 @@ export class ExceptionsZone {
         try {
             await fn();
         }
-        catch (e) {
+        catch (e: any) {
             this.exceptionHandler.handle(e);
             throw UNHANDLED_RUNTIME_EXCEPTION;
         }
