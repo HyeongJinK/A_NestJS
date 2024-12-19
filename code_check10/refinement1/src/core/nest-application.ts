@@ -2,7 +2,6 @@ import { platform } from 'os';
 import { AbstractHttpAdapter } from './adapters';
 import { ApplicationConfig } from './application-config';
 import { MESSAGES } from './constants';
-import { optionalRequire } from './helpers/optional-require';
 import { NestContainer } from './injector/container';
 import { Injector } from './injector/injector';
 import { MiddlewareContainer } from './middleware/container';
@@ -16,17 +15,12 @@ import {
   ExceptionFilter, GlobalPrefixOptions, HttpServer,
   INestApplication,
   NestApplicationOptions,
-  NestInterceptor, PipeTransform, VersioningOptions, WebSocketAdapter
+  NestInterceptor, PipeTransform, VersioningOptions
 } from "../common/interfaces";
 import {Logger} from "../common/services";
 import {CorsOptions, CorsOptionsDelegate} from "../common/interfaces/external/cors-options.interface";
 import {VersioningType} from "../common/enums";
 import {addLeadingSlash, isFunction, isObject, isString} from "../common/utils/shared.utils";
-
-const { SocketModule } = optionalRequire(
-  '@nestjs/websockets/socket-module',
-  () => require('@nestjs/websockets/socket-module'),
-);
 
 /**
  * @publicApi
@@ -42,7 +36,6 @@ export class NestApplication
   private readonly middlewareContainer = new MiddlewareContainer(
     this.container,
   );
-  private readonly socketModule = SocketModule && new SocketModule();
   private readonly routesResolver: Resolver;
   private httpServer: any;
   private isListening = false;
@@ -67,7 +60,6 @@ export class NestApplication
   }
 
   protected async dispose(): Promise<void> {
-    this.socketModule && (await this.socketModule.close());
     this.httpAdapter && (await this.httpAdapter.close());
   }
 
@@ -103,8 +95,6 @@ export class NestApplication
   }
 
   public async registerModules() {
-    this.registerWsModule();
-
     await this.middlewareModule.register(
       this.middlewareContainer,
       this.container,
@@ -112,18 +102,6 @@ export class NestApplication
       this.injector,
       this.httpAdapter,
       this.appOptions,
-    );
-  }
-
-  public registerWsModule() {
-    if (!this.socketModule) {
-      return;
-    }
-    this.socketModule.register(
-      this.container,
-      this.config,
-      this.appOptions,
-      this.httpServer,
     );
   }
 
@@ -278,11 +256,6 @@ export class NestApplication
         exclude,
       });
     }
-    return this;
-  }
-
-  public useWebSocketAdapter(adapter: WebSocketAdapter): this {
-    this.config.setIoAdapter(adapter);
     return this;
   }
 

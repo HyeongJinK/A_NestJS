@@ -6,7 +6,7 @@ import {
   GlobalPrefixOptions,
   NestInterceptor,
   PipeTransform,
-  VersioningOptions, WebSocketAdapter
+  VersioningOptions,
 } from "../common/interfaces";
 
 export class ApplicationConfig {
@@ -24,8 +24,6 @@ export class ApplicationConfig {
     [];
   private readonly globalRequestGuards: InstanceWrapper<CanActivate>[] = [];
 
-  constructor(private ioAdapter: WebSocketAdapter | null = null) {}
-
   public setGlobalPrefix(prefix: string) {
     this.globalPrefix = prefix;
   }
@@ -42,14 +40,6 @@ export class ApplicationConfig {
 
   public getGlobalPrefixOptions(): GlobalPrefixOptions<ExcludeRouteMetadata> {
     return this.globalPrefixOptions;
-  }
-
-  public setIoAdapter(ioAdapter: WebSocketAdapter) {
-    this.ioAdapter = ioAdapter;
-  }
-
-  public getIoAdapter(): WebSocketAdapter {
-    return this.ioAdapter;
   }
 
   public addGlobalPipe(pipe: PipeTransform<any>) {

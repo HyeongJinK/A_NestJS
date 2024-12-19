@@ -1,24 +1,3 @@
-// import {
-//   CanActivate,
-//   ForbiddenException,
-//   HttpServer,
-//   ParamData,
-//   PipeTransform,
-//   RequestMethod,
-// } from '@nestjs/common';
-// import {
-//   CUSTOM_ROUTE_ARGS_METADATA,
-//   HEADERS_METADATA,
-//   HTTP_CODE_METADATA,
-//   REDIRECT_METADATA,
-//   RENDER_METADATA,
-//   ROUTE_ARGS_METADATA,
-//   SSE_METADATA,
-// } from '@nestjs/common/constants';
-// import { RouteParamMetadata } from '@nestjs/common/decorators';
-// import { RouteParamtypes } from '@nestjs/common/enums/route-paramtypes.enum';
-// import { ContextType, Controller } from '@nestjs/common/interfaces';
-// import { isEmpty, isString } from '@nestjs/common/utils/shared.utils';
 import { IncomingMessage } from 'http';
 import { Observable } from 'rxjs';
 import {
@@ -45,7 +24,6 @@ import {
   RedirectResponse,
   RouterResponseController,
 } from './router-response-controller';
-import { HeaderStream } from './sse-stream';
 import {RouteParamtypes} from "../../common/enums/route-paramtypes.enum";
 import {ParamData, RouteParamMetadata} from "../../common/decorators";
 import {CanActivate, ContextType, Controller, HttpServer, PipeTransform} from "../../common/interfaces";
@@ -446,25 +424,7 @@ export class RouterExecutionContext {
         await this.responseController.redirect(result, res, redirectResponse);
       };
     }
-    const isSseHandler = !!this.reflectSse(callback);
-    if (isSseHandler) {
-      return <
-        TResult extends Observable<unknown> = any,
-        TResponse extends HeaderStream = any,
-        TRequest extends IncomingMessage = any,
-      >(
-        result: TResult,
-        res: TResponse,
-        req: TRequest,
-      ) => {
-        this.responseController.sse(
-          result,
-          (res as any).raw || res,
-          (req as any).raw || req,
-          { additionalHeaders: res.getHeaders?.() },
-        );
-      };
-    }
+
     return async <TResult, TResponse>(result: TResult, res: TResponse) => {
       result = await this.responseController.transformToResult(result);
       !isResponseHandled &&

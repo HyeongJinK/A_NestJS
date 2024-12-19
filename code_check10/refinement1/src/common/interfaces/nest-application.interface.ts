@@ -12,7 +12,6 @@ import {
 } from './index';
 import { INestApplicationContext } from './nest-application-context.interface';
 import { VersioningOptions } from './version-options.interface';
-import { WebSocketAdapter } from './websockets/web-socket-adapter.interface';
 
 /**
  * Interface defining the core NestApplication object.
@@ -75,15 +74,6 @@ export interface INestApplication<TServer = any>
    * @returns {this}
    */
   setGlobalPrefix(prefix: string, options?: GlobalPrefixOptions): this;
-
-  /**
-   * Register Ws Adapter which will be used inside Gateways.
-   * Use when you want to override default `socket.io` library.
-   *
-   * @param {WebSocketAdapter} adapter
-   * @returns {this}
-   */
-  useWebSocketAdapter(adapter: WebSocketAdapter): this;
 
   /**
    * Returns the underlying native HTTP server.

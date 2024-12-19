@@ -1,16 +1,7 @@
-import { MessageEvent} from "../../common/interfaces";
-import { IncomingMessage } from 'http';
-import { EMPTY, lastValueFrom, Observable, isObservable } from 'rxjs';
-import { catchError, debounce, map } from 'rxjs/operators';
-import {
-  AdditionalHeaders,
-  WritableHeaderStream,
-  SseStream,
-} from './sse-stream';
+import { lastValueFrom, isObservable } from 'rxjs';
 import {HttpServer} from "../../common/interfaces";
 import {Logger} from "../../common/services";
 import {HttpStatus, RequestMethod} from "../../common/enums";
-import {isObject} from "../../common/utils/shared.utils";
 
 export interface CustomHeader {
   name: string;
@@ -94,70 +85,5 @@ export class RouterResponseController {
     statusCode: number,
   ) {
     this.applicationRef.status(response, statusCode);
-  }
-
-  public sse<
-    TInput extends Observable<unknown> = any,
-    TResponse extends WritableHeaderStream = any,
-    TRequest extends IncomingMessage = any,
-  >(
-    result: TInput,
-    response: TResponse,
-    request: TRequest,
-    options?: { additionalHeaders: AdditionalHeaders },
-  ) {
-    // It's possible that we sent headers already so don't use a stream
-    if (response.writableEnded) {
-      return;
-    }
-
-    this.assertObservable(result);
-
-    const stream = new SseStream(request);
-    stream.pipe(response, options);
-
-    const subscription = result
-      .pipe(
-        map((message): MessageEvent => {
-          if (isObject(message)) {
-            return message as MessageEvent;
-          }
-
-          return { data: message as object | string };
-        }),
-        debounce(
-          message =>
-            new Promise<void>(resolve =>
-              stream.writeMessage(message, () => resolve()),
-            ),
-        ),
-        catchError(err => {
-          const data = err instanceof Error ? err.message : err;
-          stream.writeMessage({ type: 'error', data }, writeError => {
-            if (writeError) {
-              this.logger.error(writeError);
-            }
-          });
-
-          return EMPTY;
-        }),
-      )
-      .subscribe({
-        complete: () => {
-          response.end();
-        },
-      });
-
-    request.on('close', () => {
-      subscription.unsubscribe();
-    });
-  }
-
-  private assertObservable(value: any) {
-    if (!isObservable(value)) {
-      throw new ReferenceError(
-        'You must return an Observable stream to use Server-Sent Events (SSE).',
-      );
-    }
   }
 }
