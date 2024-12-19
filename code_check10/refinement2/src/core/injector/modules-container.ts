@@ -7,8 +7,4 @@ export class ModulesContainer extends Map<string, Module> {
   get applicationId(): string {
     return this._applicationId;
   }
-
-  public getById(id: string): Module | undefined {
-    return Array.from(this.values()).find(moduleRef => moduleRef.id === id);
-  }
 }

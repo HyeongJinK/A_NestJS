@@ -1,7 +1,7 @@
 import {Paramtype} from "../../common/interfaces";
 import {RouteParamtypes} from "../../common/enums/route-paramtypes.enum";
 
-export class ParamsTokenFactory {
+class ParamsTokenFactory {
   public exchangeEnumForString(type: RouteParamtypes): Paramtype {
     switch (type) {
       case RouteParamtypes.BODY:

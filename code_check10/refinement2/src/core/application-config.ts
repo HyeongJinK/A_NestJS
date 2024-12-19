@@ -17,7 +17,6 @@ export class ApplicationConfig {
   private globalInterceptors: Array<NestInterceptor> = [];
   private globalGuards: Array<CanActivate> = [];
   private versioningOptions: VersioningOptions;
-  private readonly globalRequestPipes: InstanceWrapper<PipeTransform>[] = [];
   private readonly globalRequestFilters: InstanceWrapper<ExceptionFilter>[] =
     [];
   private readonly globalRequestInterceptors: InstanceWrapper<NestInterceptor>[] =
@@ -40,10 +39,6 @@ export class ApplicationConfig {
 
   public getGlobalPrefixOptions(): GlobalPrefixOptions<ExcludeRouteMetadata> {
     return this.globalPrefixOptions;
-  }
-
-  public addGlobalPipe(pipe: PipeTransform<any>) {
-    this.globalPipes.push(pipe);
   }
 
   public useGlobalPipes(...pipes: PipeTransform<any>[]) {
@@ -98,14 +93,6 @@ export class ApplicationConfig {
 
   public getGlobalRequestInterceptors(): InstanceWrapper<NestInterceptor>[] {
     return this.globalRequestInterceptors;
-  }
-
-  public addGlobalRequestPipe(wrapper: InstanceWrapper<PipeTransform>) {
-    this.globalRequestPipes.push(wrapper);
-  }
-
-  public getGlobalRequestPipes(): InstanceWrapper<PipeTransform>[] {
-    return this.globalRequestPipes;
   }
 
   public addGlobalRequestFilter(wrapper: InstanceWrapper<ExceptionFilter>) {

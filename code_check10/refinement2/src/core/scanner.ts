@@ -37,7 +37,7 @@ import {
   INJECTABLE_WATERMARK, INTERCEPTORS_METADATA,
   MODULE_METADATA, PIPES_METADATA, ROUTE_ARGS_METADATA
 } from "../common/constants";
-import {isFunction, isNil, isUndefined} from "../common/utils/shared.utils";
+import {isNil, isUndefined} from "../common/utils/shared.utils";
 
 interface ApplicationProviderWrapper {
   moduleKey: string;
@@ -642,8 +642,6 @@ export class DependenciesScanner {
     return {
       [APP_INTERCEPTOR]: (interceptor: NestInterceptor) =>
         this.applicationConfig.addGlobalInterceptor(interceptor),
-      [APP_PIPE]: (pipe: PipeTransform) =>
-        this.applicationConfig.addGlobalPipe(pipe),
       [APP_GUARD]: (guard: CanActivate) =>
         this.applicationConfig.addGlobalGuard(guard),
       [APP_FILTER]: (filter: ExceptionFilter) =>
@@ -655,8 +653,6 @@ export class DependenciesScanner {
     return {
       [APP_INTERCEPTOR]: (interceptor: InstanceWrapper<NestInterceptor>) =>
         this.applicationConfig.addGlobalRequestInterceptor(interceptor),
-      [APP_PIPE]: (pipe: InstanceWrapper<PipeTransform>) =>
-        this.applicationConfig.addGlobalRequestPipe(pipe),
       [APP_GUARD]: (guard: InstanceWrapper<CanActivate>) =>
         this.applicationConfig.addGlobalRequestGuard(guard),
       [APP_FILTER]: (filter: InstanceWrapper<ExceptionFilter>) =>

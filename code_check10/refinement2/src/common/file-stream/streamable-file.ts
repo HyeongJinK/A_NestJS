@@ -84,9 +84,4 @@ export class StreamableFile {
   get errorLogger() {
     return this.logError;
   }
-
-  setErrorLogger(handler: (err: Error) => void) {
-    this.logError = handler;
-    return this;
-  }
 }

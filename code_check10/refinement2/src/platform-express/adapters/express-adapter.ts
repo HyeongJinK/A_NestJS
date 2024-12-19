@@ -257,11 +257,6 @@ export class ExpressAdapter extends AbstractHttpAdapter<
     return this;
   }
 
-  public setLocal(key: string, value: any) {
-    this.instance.locals[key] = value;
-    return this;
-  }
-
   public getType(): string {
     return 'express';
   }

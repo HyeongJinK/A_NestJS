@@ -71,10 +71,6 @@ export class NestApplication
     this.httpServer = this.createServer();
   }
 
-  public getUnderlyingHttpServer<T>(): T {
-    return this.httpAdapter.getHttpServer();
-  }
-
   public applyOptions() {
     if (!this.appOptions || !this.appOptions.cors) {
       return undefined;

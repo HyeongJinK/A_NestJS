@@ -1,6 +1,6 @@
 import { ExecutionContextHost } from './execution-context-host';
 import {ParamData} from "../../common/decorators";
-import {ContextType, Controller, PipeTransform, Type} from "../../common/interfaces";
+import {ContextType, Controller, Type} from "../../common/interfaces";
 import {PARAMTYPES_METADATA, RESPONSE_PASSTHROUGH_METADATA} from "../../common/constants";
 import {isFunction} from "../../common/utils/shared.utils";
 
@@ -8,7 +8,7 @@ export interface ParamProperties<T = any, IExtractor extends Function = any> {
   index: number;
   type: T | string;
   data: ParamData;
-  pipes: PipeTransform[];
+  // pipes: PipeTransform[];
   extractValue: IExtractor;
 }
 

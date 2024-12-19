@@ -1,11 +1,14 @@
 import {Controller, Get, Query} from "./common/decorators";
+import {TestService} from "./test.service";
 
 
 @Controller("/abc")
 export class TestController {
     asdfg = "test";
 
-    constructor() {
+    constructor(
+        private readonly testService: TestService
+    ) {
         console.log("TestController constructor");
     }
 
@@ -14,5 +17,10 @@ export class TestController {
         console.log(`id: ${id}`);
         console.log("TestController test");
         return "test";
+    }
+
+    @Get('/hello')
+    hello() {
+        return this.testService.getHello();
     }
 }

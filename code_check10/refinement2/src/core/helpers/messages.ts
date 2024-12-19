@@ -37,9 +37,3 @@ export const VERSIONED_CONTROLLER_MAPPING_MESSAGE = (
 
   return `${name} {${path}} (version: ${versions}):`;
 };
-
-export const INVALID_EXECUTION_CONTEXT = (
-  methodName: string,
-  currentContext: string,
-) =>
-  `Calling ${methodName} is not allowed in this context. Your current execution context is "${currentContext}".`;

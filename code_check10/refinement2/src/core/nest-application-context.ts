@@ -265,13 +265,6 @@ export class NestApplicationContext<
   }
 
   /**
-   * Define that it must flush logs right after defining a custom logger.
-   */
-  public flushLogsOnOverride() {
-    this.shouldFlushLogsOnOverride = true;
-  }
-
-  /**
    * Enables the usage of shutdown hooks. Will call the
    * `onApplicationShutdown` function of a provider if the
    * process receives a shutdown signal.

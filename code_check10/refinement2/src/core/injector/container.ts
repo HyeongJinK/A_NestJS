@@ -1,12 +1,10 @@
 import { ApplicationConfig } from '../application-config';
-import { DiscoverableMetaHostCollection } from '../discovery/discoverable-meta-host-collection';
 import {
   CircularDependencyException,
   UndefinedForwardRefException,
   UnknownModuleException,
 } from '../errors/exceptions';
 import { InitializeOnPreviewAllowlist } from '../inspector/initialize-on-preview.allowlist';
-import { SerializedGraph } from '../inspector/serialized-graph';
 import { REQUEST } from '../router/request/request-constants';
 import { ModuleCompiler, ModuleFactory } from './compiler';
 import { ContextId } from './instance-wrapper';
@@ -31,16 +29,11 @@ export class NestContainer {
     Partial<DynamicModule>
   >();
   private readonly internalProvidersStorage = new InternalProvidersStorage();
-  private readonly _serializedGraph = new SerializedGraph();
   private internalCoreModule: Module;
 
   constructor(
     private readonly _applicationConfig: ApplicationConfig = undefined,
   ) {}
-
-  get serializedGraph(): SerializedGraph {
-    return this._serializedGraph;
-  }
 
   get applicationConfig(): ApplicationConfig | undefined {
     return this._applicationConfig;
@@ -197,10 +190,6 @@ export class NestContainer {
     return this.modules.get(moduleKey);
   }
 
-  public getInternalCoreModuleRef(): Module | undefined {
-    return this.internalCoreModule;
-  }
-
   public async addImport(
     relatedModule: Type<any> | DynamicModule,
     token: string,
@@ -228,9 +217,6 @@ export class NestContainer {
       throw new UnknownModuleException();
     }
     const providerKey = moduleRef.addProvider(provider, enhancerSubtype);
-    const providerRef = moduleRef.getProviderByKey(providerKey);
-
-    DiscoverableMetaHostCollection.inspectProvider(this.modules, providerRef);
 
     return providerKey as Function;
   }
@@ -262,12 +248,6 @@ export class NestContainer {
     }
     const moduleRef = this.modules.get(token);
     moduleRef.addController(controller);
-
-    const controllerRef = moduleRef.controllers.get(controller);
-    DiscoverableMetaHostCollection.inspectController(
-      this.modules,
-      controllerRef,
-    );
   }
 
   public clear() {
@@ -295,7 +275,6 @@ export class NestContainer {
     target.addImport(globalModule);
   }
 
-  public getDynamicMetadataByToken(token: string): Partial<DynamicModule>;
   public getDynamicMetadataByToken<
     K extends Exclude<keyof DynamicModule, 'global' | 'module'>,
   >(token: string, metadataKey: K): DynamicModule[K];

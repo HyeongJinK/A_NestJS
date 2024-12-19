@@ -1,4 +1,4 @@
-pipe 삭제
+pipe 삭제, discover 삭제
 
 ```shell
 Errors  Files

@@ -149,20 +149,6 @@ export class HttpException extends Error {
     return arg0;
   }
 
-  public static getDescriptionFrom(
-    descriptionOrOptions: string | HttpExceptionOptions,
-  ): string {
-    return isString(descriptionOrOptions)
-      ? descriptionOrOptions
-      : descriptionOrOptions?.description;
-  }
-
-  public static getHttpExceptionOptionsFrom(
-    descriptionOrOptions: string | HttpExceptionOptions,
-  ): HttpExceptionOptions {
-    return isString(descriptionOrOptions) ? {} : descriptionOrOptions;
-  }
-
   /**
    * Utility method used to extract the error description and httpExceptionOptions from the given argument.
    * This is used by inheriting classes to correctly parse both options.

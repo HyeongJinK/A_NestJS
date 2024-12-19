@@ -48,10 +48,6 @@ export class MiddlewareBuilder implements MiddlewareConsumer {
       private routeInfoPathExtractor: RouteInfoPathExtractor,
     ) {}
 
-    public getExcludedRoutes(): RouteInfo[] {
-      return this.excludedRoutes;
-    }
-
     public exclude(
       ...routes: Array<string | RouteInfo>
     ): MiddlewareConfigProxy {

@@ -1,6 +1,5 @@
 import { ExternalContextCreator } from '../../helpers/external-context-creator';
 import { HttpAdapterHost } from '../../helpers/http-adapter-host';
-import { SerializedGraph } from '../../inspector/serialized-graph';
 import { ModuleOverride } from '../../interfaces/module-override.interface';
 import { DependenciesScanner } from '../../scanner';
 import { ModuleCompiler } from '../compiler';
@@ -55,10 +54,6 @@ export class InternalCoreModuleFactory {
       {
         provide: LazyModuleLoader,
         useFactory: lazyModuleLoaderFactory,
-      },
-      {
-        provide: SerializedGraph,
-        useFactory: () => container.serializedGraph,
       },
     ]);
   }

@@ -1,5 +1,3 @@
-import { IncomingMessage } from 'http';
-import { Observable } from 'rxjs';
 import {
   FORBIDDEN_MESSAGE,
   GuardsConsumer,
@@ -16,8 +14,6 @@ import {
 import { STATIC_CONTEXT } from '../injector/constants';
 import { InterceptorsConsumer } from '../interceptors/interceptors-consumer';
 import { InterceptorsContextCreator } from '../interceptors/interceptors-context-creator';
-import { PipesConsumer } from '../pipes/pipes-consumer';
-import { PipesContextCreator } from '../pipes/pipes-context-creator';
 import { IRouteParamsFactory } from './interfaces/route-params-factory.interface';
 import {
   CustomHeader,
@@ -34,7 +30,7 @@ import {
   HTTP_CODE_METADATA,
   REDIRECT_METADATA,
   RENDER_METADATA,
-  ROUTE_ARGS_METADATA, SSE_METADATA
+  ROUTE_ARGS_METADATA
 } from "../../common/constants";
 import {isEmpty, isString} from "../../common/utils/shared.utils";
 import {ForbiddenException} from "../../common/exceptions";
@@ -43,7 +39,7 @@ export interface ParamProperties {
   index: number;
   type: RouteParamtypes | string;
   data: ParamData;
-  pipes: PipeTransform[];
+  // pipes: PipeTransform[];
   extractValue: <TRequest, TResponse>(
     req: TRequest,
     res: TResponse,
@@ -58,8 +54,6 @@ export class RouterExecutionContext {
 
   constructor(
     private readonly paramsFactory: IRouteParamsFactory,
-    private readonly pipesContextCreator: PipesContextCreator,
-    private readonly pipesConsumer: PipesConsumer,
     private readonly guardsContextCreator: GuardsContextCreator,
     private readonly guardsConsumer: GuardsConsumer,
     private readonly interceptorsContextCreator: InterceptorsContextCreator,
@@ -100,13 +94,7 @@ export class RouterExecutionContext {
       getParamsMetadata(moduleKey, contextId, inquirerId),
       paramtypes,
     );
-    const pipes = this.pipesContextCreator.create(
-      instance,
-      callback,
-      moduleKey,
-      contextId,
-      inquirerId,
-    );
+
     const guards = this.guardsContextCreator.create(
       instance,
       callback,
@@ -128,7 +116,6 @@ export class RouterExecutionContext {
       callback,
       contextType,
     );
-    const fnApplyPipes = this.createPipesFn(pipes, paramsOptions);
 
     const handler =
       <TRequest, TResponse>(
@@ -138,7 +125,6 @@ export class RouterExecutionContext {
         next: Function,
       ) =>
       async () => {
-        fnApplyPipes && (await fnApplyPipes(args, req, res, next));
         return callback.apply(instance, args);
       };
 
@@ -268,10 +254,6 @@ export class RouterExecutionContext {
     return Reflect.getMetadata(HEADERS_METADATA, callback) || [];
   }
 
-  public reflectSse(callback: (...args: unknown[]) => unknown): string {
-    return Reflect.getMetadata(SSE_METADATA, callback);
-  }
-
   public exchangeKeysForValues(
     keys: string[],
     metadata: Record<number, RouteParamMetadata>,
@@ -280,15 +262,9 @@ export class RouterExecutionContext {
     inquirerId?: string,
     contextFactory?: (args: unknown[]) => ExecutionContextHost,
   ): ParamProperties[] {
-    this.pipesContextCreator.setModuleContext(moduleContext);
-
     return keys.map(key => {
-      const { index, data, pipes: pipesCollection } = metadata[key];
-      const pipes = this.pipesContextCreator.createConcreteContext(
-        pipesCollection,
-        contextId,
-        inquirerId,
-      );
+      const { index, data } = metadata[key];
+
       const type = this.contextUtils.mapParamType(key);
 
       if (key.includes(CUSTOM_ROUTE_ARGS_METADATA)) {
@@ -298,7 +274,7 @@ export class RouterExecutionContext {
           data,
           contextFactory,
         );
-        return { index, extractValue: customExtractValue, type, data, pipes };
+        return { index, extractValue: customExtractValue, type, data };
       }
       const numericType = Number(type);
       const extractValue = <TRequest, TResponse>(
@@ -311,7 +287,7 @@ export class RouterExecutionContext {
           res,
           next,
         });
-      return { index, extractValue, type: numericType, data, pipes };
+      return { index, extractValue, type: numericType, data };
     });
   }
 
@@ -324,26 +300,8 @@ export class RouterExecutionContext {
     }: { metatype: unknown; type: RouteParamtypes; data: unknown },
     pipes: PipeTransform[],
   ): Promise<unknown> {
-    if (!isEmpty(pipes)) {
-      return this.pipesConsumer.apply(
-        value,
-        { metatype, type, data } as any,
-        pipes,
-      );
-    }
-    return value;
-  }
 
-  public isPipeable(type: number | string): boolean {
-    return (
-      type === RouteParamtypes.BODY ||
-      type === RouteParamtypes.RAW_BODY ||
-      type === RouteParamtypes.QUERY ||
-      type === RouteParamtypes.PARAM ||
-      type === RouteParamtypes.FILE ||
-      type === RouteParamtypes.FILES ||
-      isString(type)
-    );
+    return value;
   }
 
   public createGuardsFn<TContext extends string = ContextType>(
@@ -365,42 +323,6 @@ export class RouterExecutionContext {
       }
     };
     return guards.length ? canActivateFn : null;
-  }
-
-  public createPipesFn(
-    pipes: PipeTransform[],
-    paramsOptions: (ParamProperties & { metatype?: any })[],
-  ) {
-    const pipesFn = async <TRequest, TResponse>(
-      args: any[],
-      req: TRequest,
-      res: TResponse,
-      next: Function,
-    ) => {
-      const resolveParamValue = async (
-        param: ParamProperties & { metatype?: any },
-      ) => {
-        const {
-          index,
-          extractValue,
-          type,
-          data,
-          metatype,
-          pipes: paramPipes,
-        } = param;
-        const value = extractValue(req, res, next);
-
-        args[index] = this.isPipeable(type)
-          ? await this.getParamValue(
-              value,
-              { metatype, type, data } as any,
-              pipes.concat(paramPipes),
-            )
-          : value;
-      };
-      await Promise.all(paramsOptions.map(resolveParamValue));
-    };
-    return paramsOptions.length ? pipesFn : null;
   }
 
   public createHandleResponseFn(

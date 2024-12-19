@@ -288,18 +288,6 @@ export class Logger implements LoggerService {
     this.isBufferAttached = true;
   }
 
-  /**
-   * Detach buffer.
-   * Turns off initialization logs buffering.
-   */
-  static detachBuffer() {
-    this.isBufferAttached = false;
-  }
-
-  static getTimestamp() {
-    return dateTimeFormatter.format(Date.now());
-  }
-
   static overrideLogger(logger: LoggerService | LogLevel[] | boolean) {
     if (Array.isArray(logger)) {
       Logger.logLevels = logger;
@@ -315,11 +303,6 @@ export class Logger implements LoggerService {
     } else {
       this.staticInstanceRef = undefined;
     }
-  }
-
-  static isLevelEnabled(level: LogLevel): boolean {
-    const logLevels = Logger.logLevels;
-    return isLogLevelEnabled(level, logLevels);
   }
 
   private registerLocalInstanceRef() {

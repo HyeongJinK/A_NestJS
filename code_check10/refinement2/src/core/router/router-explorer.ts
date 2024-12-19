@@ -23,7 +23,6 @@ import {
   HttpEntrypointMetadata,
 } from '../inspector/interfaces/entrypoint.interface';
 import { MetadataScanner } from '../metadata-scanner';
-import { PipesConsumer, PipesContextCreator } from '../pipes';
 import { ExceptionsFilter } from './interfaces/exceptions-filter.interface';
 import { RoutePathMetadata } from './interfaces/route-path-metadata.interface';
 import { PathsExplorer } from './paths-explorer';
@@ -68,8 +67,6 @@ export class RouterExplorer {
     this.pathsExplorer = new PathsExplorer(metadataScanner);
 
     const routeParamsFactory = new RouteParamsFactory();
-    const pipesContextCreator = new PipesContextCreator(container, config);
-    const pipesConsumer = new PipesConsumer();
     const guardsContextCreator = new GuardsContextCreator(container, config);
     const guardsConsumer = new GuardsConsumer();
     const interceptorsContextCreator = new InterceptorsContextCreator(
@@ -80,8 +77,6 @@ export class RouterExplorer {
 
     this.executionContextCreator = new RouterExecutionContext(
       routeParamsFactory,
-      pipesContextCreator,
-      pipesConsumer,
       guardsContextCreator,
       guardsConsumer,
       interceptorsContextCreator,

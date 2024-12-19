@@ -1,4 +1,3 @@
-// import { IntrospectionResult, Scope, Type } from '@nestjs/common';
 import { getClassScope } from '../helpers/get-class-scope';
 import { isDurable } from '../helpers/is-durable';
 import { AbstractInstanceResolver } from './abstract-instance-resolver';
@@ -7,7 +6,7 @@ import { Injector } from './injector';
 import { InstanceLinksHost } from './instance-links-host';
 import { ContextId, InstanceWrapper } from './instance-wrapper';
 import { Module } from './module';
-import {IntrospectionResult, Scope, Type} from "../../common/interfaces";
+import {Type} from "../../common/interfaces";
 
 export interface ModuleRefGetOrResolveOpts {
   /**
@@ -133,24 +132,6 @@ export abstract class ModuleRef extends AbstractInstanceResolver {
     type: Type<T>,
     contextId?: ContextId,
   ): Promise<T>;
-
-  public introspect<T = any>(
-    token: Type<T> | string | symbol,
-  ): IntrospectionResult {
-    const { wrapperRef } = this.instanceLinksHost.get(token);
-
-    let scope = Scope.DEFAULT;
-    if (!wrapperRef.isDependencyTreeStatic()) {
-      scope = Scope.REQUEST;
-    } else if (wrapperRef.isTransient) {
-      scope = Scope.TRANSIENT;
-    }
-    return { scope };
-  }
-
-  public registerRequestByContextId<T = any>(request: T, contextId: ContextId) {
-    this.container.registerRequestProvider(request, contextId);
-  }
 
   protected async instantiateClass<T = any>(
     type: Type<T>,
