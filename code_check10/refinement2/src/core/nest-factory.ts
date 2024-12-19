@@ -47,13 +47,13 @@ export class NestFactoryStatic {
       ? [serverOrOptions, options]
       : [this.createHttpAdapter(), serverOrOptions];
 
-    const applicationConfig = new ApplicationConfig();
-    const container = new NestContainer(applicationConfig);
+    const applicationConfig = new ApplicationConfig();                // 옵션 설정파일
+    const container = new NestContainer(applicationConfig);           // 컨테이너 생성
 
-    this.setAbortOnError(serverOrOptions, options);
-    this.registerLoggerConfiguration(appOptions);
+    this.setAbortOnError(serverOrOptions, options);                   // abortOnError 설정
+    this.registerLoggerConfiguration(appOptions);                     // logger 설정
 
-    await this.initialize(
+    await this.initialize(    // 초기화
       moduleCls,
       container,
       applicationConfig,
@@ -107,7 +107,7 @@ export class NestFactoryStatic {
 
       await ExceptionsZone.asyncRun(
         async () => {
-          await dependenciesScanner.scan(module);
+          await dependenciesScanner.scan(module);                 // 스캔 시작
           await instanceLoader.createInstancesOfDependencies();
           dependenciesScanner.applyApplicationProviders();
         },
@@ -168,14 +168,14 @@ export class NestFactoryStatic {
     if (!options) {
       return;
     }
-    const { logger, bufferLogs, autoFlushLogs } = options;
-    if ((logger as boolean) !== true && !isNil(logger)) {
+    const { logger, bufferLogs, autoFlushLogs } = options;  // 옵셥에서 logger, bufferLogs, autoFlushLog 값 가져오기
+    if ((logger as boolean) !== true && !isNil(logger)) {   // logger가 true가 아니고 null이 아닐 경우
       Logger.overrideLogger(logger);
     }
-    if (bufferLogs) {
-      Logger.attachBuffer();
+    if (bufferLogs) {                                       // bufferLogs 설정이 되었을 경우
+      Logger.attachBuffer();  // 로그 버퍼에 기록?
     }
-    this.autoFlushLogs = autoFlushLogs ?? true;
+    this.autoFlushLogs = autoFlushLogs ?? true;             // ??: Nullish Coalescing Operator로, null 또는 undefined인 경우 오른쪽 값을 반환합니다.
   }
 
   private createHttpAdapter<T = any>(httpServer?: T): AbstractHttpAdapter {

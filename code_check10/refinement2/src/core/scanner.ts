@@ -38,6 +38,7 @@ import {
   MODULE_METADATA, PIPES_METADATA, ROUTE_ARGS_METADATA
 } from "../common/constants";
 import {isNil, isUndefined} from "../common/utils/shared.utils";
+import {Logger} from "../common/services";
 
 interface ApplicationProviderWrapper {
   moduleKey: string;
@@ -55,6 +56,7 @@ interface ModulesScanParameters {
 }
 
 export class DependenciesScanner {
+  private readonly logger = new Logger('DependenciesScanner', { timestamp: true });
   private readonly applicationProvidersApplyMap: ApplicationProviderWrapper[] =
     [];
 
@@ -68,7 +70,7 @@ export class DependenciesScanner {
     module: Type<any>,
     options?: { overrides?: ModuleOverride[] },
   ) {
-    await this.registerCoreModule(options?.overrides);
+    await this.registerCoreModule(options?.overrides);    // 코어모듈 생성?
     await this.scanForModules({
       moduleDefinition: module,
       overrides: options?.overrides,
@@ -560,8 +562,9 @@ export class DependenciesScanner {
   }
 
   public async registerCoreModule(overrides?: ModuleOverride[]) {
+    this.logger.log(`[scan register-core-module] overrides: ${overrides} this.container: ${this.container}`);
     const moduleDefinition = InternalCoreModuleFactory.create(
-      this.container,
+      this.container,       // NestContainer            const container = new NestContainer(applicationConfig);
       this,
       this.container.getModuleCompiler(),
       this.container.getHttpAdapterHostRef(),
