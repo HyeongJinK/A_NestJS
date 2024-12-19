@@ -24,9 +24,7 @@ import {ExpressAdapter} from "../platform-express/adapters";
  * @publicApi
  */
 export class NestFactoryStatic {
-  private readonly logger = new Logger('NestFactory', {
-    timestamp: true,
-  });
+  private readonly logger = new Logger('NestFactory', { timestamp: true });
   private abortOnError = true;
   private autoFlushLogs = false;
 
@@ -44,6 +42,7 @@ export class NestFactoryStatic {
     serverOrOptions?: AbstractHttpAdapter | NestApplicationOptions,
     options?: NestApplicationOptions,
   ): Promise<T> {
+    this.logger.log("[Factory - create] 프로그램 시작")
     const [httpServer, appOptions] = this.isHttpServer(serverOrOptions)
       ? [serverOrOptions, options]
       : [this.createHttpAdapter(), serverOrOptions];

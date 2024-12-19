@@ -29,7 +29,7 @@ const DEFAULT_LOG_LEVELS: LogLevel[] = [
   'fatal',
 ];
 
-const dateTimeFormatter = new Intl.DateTimeFormat(undefined, {
+const dateTimeFormatter = new Intl.DateTimeFormat('ko-KR', {
   year: 'numeric',
   hour: 'numeric',
   minute: 'numeric',
@@ -358,6 +358,8 @@ export class ConsoleLogger implements LoggerService {
         return clc.cyanBright;
       case 'fatal':
         return clc.bold;
+      // case 'log2':
+      //   return clc.
       default:
         return clc.green;
     }
