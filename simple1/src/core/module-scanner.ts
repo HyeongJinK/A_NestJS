@@ -3,8 +3,14 @@ import 'reflect-metadata';
 
 export class ModuleScanner {
     scan(module: any) {
+        const modules = [module];
         const metadata = Reflect.getMetadata('module', module);
-        console.log('Scanning Module:', metadata);
-        return metadata;
+
+        if (metadata?.imports) {
+            metadata.imports.forEach((importedModule: any) => {
+                modules.push(...this.scan(importedModule));
+            });
+        }
+        return modules;
     }
 }

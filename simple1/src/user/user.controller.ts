@@ -1,11 +1,17 @@
 import { Controller } from '../decorators/controller.decorator';
-import { UserService } from './user.service';
+import {Get, Post} from "../decorators/request.decorator";
 
 @Controller('users')
 export class UserController {
-    constructor(private userService: UserService) {}
+    // @ts-ignore
+    @Get('/')
+    getUsers() {
+        return ['User1', 'User2'];
+    }
 
-    getAllUsers() {
-        return this.userService.getUsers();
+    // @ts-ignore
+    @Post('/')
+    createUser() {
+        return 'User created';
     }
 }

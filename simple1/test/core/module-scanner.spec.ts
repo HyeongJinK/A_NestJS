@@ -1,4 +1,4 @@
-import { ModuleScanner } from './module-scanner';
+import { ModuleScanner } from '../../src/core/module-scanner';
 
 describe('ModuleScanner', () => {
     it('should scan module metadata', () => {

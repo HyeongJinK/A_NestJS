@@ -1,5 +1,5 @@
 // src/core/nest-factory.spec.ts
-import { NestFactory } from './nest-factory';
+import { NestFactory } from '../../src/core/nest-factory';
 
 describe('NestFactory', () => {
     it('should create an application instance', async () => {

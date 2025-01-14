@@ -1,4 +1,4 @@
-import { SimpleApplication } from './simple-application';
+import { SimpleApplication } from '../../src/core/simple-application';
 
 describe('SimpleApplication', () => {
     it('should initialize with a module', async () => {
