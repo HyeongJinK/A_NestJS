@@ -1,4 +1,6 @@
 // src/decorators/request.decorator.ts
+import 'reflect-metadata';
+
 export function Get(path: string = ''): MethodDecorator {
     return (target, propertyKey, descriptor) => {
         Reflect.defineMetadata('method', 'GET', descriptor.value);
